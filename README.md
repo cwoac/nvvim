@@ -4,7 +4,7 @@ A [Notational Velocity][nv] inspired mode for [vim][].
 
 
 ## Requirements
-This should work on any recent vim compiled with `+python`[^1][]. You will also need the [xapian][] library and python bindings.
+This should work on any recent vim compiled with `+python`. You will also need the [xapian][] library and python bindings. Note that xapian does not currently work with python3.
 
 ## Installation
 The installation process is currently rather manual. 
@@ -48,5 +48,3 @@ Quite a few things, although the code is quite usable as-is.
  [nv]: http://www.notational.net
  [vim]: http://www.vim.org
  [xapian]: http://xapian.org
-
- [^1]: python2 is a requirement as xapian does not currently support python3.
