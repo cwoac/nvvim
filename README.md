@@ -7,10 +7,15 @@ A [Notational Velocity][nv] inspired mode for [vim][].
 This should work on any recent vim compiled with `+python`. You will also need the [xapian][] library and python bindings. Note that xapian does not currently work with python3.
 
 ## Installation
-The installation process is currently rather manual. 
+The installation process is currently rather manual. Copy `nvim` to somewhere on your path and `nvim.vim` into `~/.vim/` (or anywhere else - just edit the nvim script accordingly)
 
 ## Usage
-Use `index.py` to initialise the database (see below) then run `vim -S nvim.vim` from the directory containing it's notes.. You will be presented with two windows - on the right is the main pane where the note is displayed; on the left the list of search results.
+
+I've made a quick screencast [here](http://showterm.io/3668688fe06b53482da16) outlining basic usage.
+
+
+* (Optionally) Use `index.py` to initialise the database with existing notes (see below).
+* run `nvim` from within that directory. You will be presented with two windows - on the right is the main pane where the note is displayed; on the left the list of search results.
 The first line of the search box is the current search term.
 
 Use `[[` to trigger vim's autocomplete with the list of availiable titles.
@@ -34,7 +39,7 @@ The full range of vim commands are availiable to you, but there are a couple of 
 configuration is handled at the top of the script / python files. The main one is the extension for notes. By default, nvim uses `.md` and will ignore files with any other extension.
 
 ### Importing
-If you have a bunch of notes already, then copy `index.py` to the note dir and run it (you can delete it afterwards)
+If you have a bunch of notes already, then copy `index.py` to the note dir and run it (you can delete it afterwards) to populate the database with the details.
 
 ## TODO
 Quite a few things, although the code is quite usable as-is.
