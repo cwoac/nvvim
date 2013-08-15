@@ -1,6 +1,8 @@
-let g:extension = '.md'
+let g:NVIM_extension = '.md'
+let g:NVIM_database  = '.nvim'
+let g:NVIM_language  = 'en'
 
-function! SetupBuffer()
+function! s:SetupBuffer()
   30vnew  _nvim
   python buf_results = vim.current.buffer
   python win_results = vim.current.window
@@ -14,6 +16,7 @@ function! SetupBuffer()
   nnoremap <buffer> <CR> :python load_from_buffer()<CR>
 endfunction
 
+" Needs to be external scope to allow calls from python
 function! NVIM_getchar()
   let c = getchar()
   if c =~ '^\d\+$'
@@ -31,24 +34,28 @@ function! NVIM_getchar()
   return c
 endfunction
 
-function! DefPython()
+function! s:DefPython()
 python << PYEND
 import vim
 import os
 import xapian
 
-db = xapian.WritableDatabase( 'nvim',xapian.DB_OPEN )
+extension = vim.eval('g:NVIM_extension')
+database  = vim.eval('g:NVIM_database')
+language  = vim.eval('g:NVIM_language')
+db = xapian.WritableDatabase( database,xapian.DB_CREATE_OR_OPEN )
 qp = xapian.QueryParser()
-qp.set_stemmer( xapian.Stem( 'en' ) )
+qp.set_stemmer( xapian.Stem( language ) )
 qp.set_stemming_strategy( qp.STEM_SOME )
 qp.add_prefix( "title","S" )
 tg = xapian.TermGenerator()
-tg.set_stemmer( xapian.Stem("en") )
+tg.set_stemmer( xapian.Stem( language ) )
 tg.set_stemming_strategy( tg.STEM_SOME )
 
 e  = xapian.Enquire(db)
-e.set_sort_by_value(2,False)
+e.set_sort_by_value( 2,False )
 
+# TODO - merge this into index.py somehow.
 def update_file( filename ):
   fh = open( filename, 'r' )
   data = fh.read()
@@ -105,23 +112,26 @@ def populate_complete(base=''):
   x  = ','.join(m)
   vim.command( "let g:nvim_ret=["+x+"]")
 
-def populate_initial_buffer():
-  results=get_all()
-  buf_results[:]=None
-  buf_results.append('----------')
-  for r in results:
-    buf_results.append(r.document.get_value(1))
-
-
-def populate_buffer():
-  search=buf_results[0]
-  results=get(search)
+def redraw_buffer( results ):
   buf_results[1:] = None
   buf_results.append('----------')
   for r in results:
     buf_results.append(r.document.get_value(1))
 
+def populate_initial_buffer():
+  results=get_all()
+  buf_results[:]=None
+  redraw_buffer( results )
+
+
+def populate_buffer():
+  search=buf_results[0]
+  results=get(search)
+  redraw_buffer( results )
+
 # Called everytime the user presses a key when in seek mode on the title.
+# Returns True iff the user has hit a key which should terminate input.
+# TODO - implement Left/Right key support
 def handle_user( char ):
   if char == '\r': # Carriage return
     load_from_buffer()
@@ -150,9 +160,7 @@ def set_entry_line( value ):
 def load_note( note ):
   move_to_data()
   cmd = 'edit '+note.replace(' ','\ ')
-  print cmd
   vim.command(cmd )
-  
 
 def move_to_results():
   if vim.current.buffer != buf_results:
@@ -161,7 +169,6 @@ def move_to_results():
 def move_to_data():
   if vim.current.buffer == buf_results:
     vim.command( "wincmd p" )
-
 
 def load_from_buffer():
   move_to_results()
@@ -176,7 +183,7 @@ def load_from_buffer():
   load_note( filename )
 
   # TODO - this should probably look things up properly and be in an event
-  # handler
+  # handler, but it seems to work.
   set_entry_line( buf_results[row] )
 
 # Accept input into the entry line and present it accordingly. 
@@ -197,12 +204,13 @@ def load_from_selection():
   name = vim.eval( '@"' )
   filename = get_filename( name )
   load_note( filename )
+  # TODO - remove if/when we put it in an onload handler
   set_entry_line( name )
 
 PYEND
 endfunction
 
-function! NVIM_setup_data()
+function! s:NVIM_setup_data()
   set completefunc=CompleteNVIM
   set completeopt=menu,menuone,longest
   set ignorecase
@@ -228,11 +236,10 @@ function! CompleteNVIM(findstart,base)
     endif
 endfunction
 
-call NVIM_setup_data()
-call SetupBuffer()
-call DefPython()
+call s:NVIM_setup_data()
+call s:SetupBuffer()
+call s:DefPython()
 python populate_initial_buffer()
-python extension = vim.eval('g:extension')
 
 inoremap        [[ [[]]<Left><Left><C-x><C-u>
 inoremap        <silent>  <Leader>i <ESC>:python handle_entry_line()<CR>
@@ -243,5 +250,5 @@ inoremap        <silent>  <Leader><CR> <ESC>:python load_from_selection()<CR>
 augroup nvim_group
   autocmd!
   autocmd BufWritePost,FileWritePost,FileAppendPost * :python update_file( vim.eval('@%') )
-  autocmd BufNew * :call NVIM_setup_data()
+  autocmd BufNew * :call s:NVIM_setup_data()
 augroup END

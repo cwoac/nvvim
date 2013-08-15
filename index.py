@@ -6,6 +6,7 @@ import xapian
 import re
 
 extension = '.md'
+database = '.nvim'
 
 
 def index( path, file, db,tg ):
@@ -39,7 +40,7 @@ def index( path, file, db,tg ):
 
 #index( sys.argv[1], sys.argv[2] )
 
-db = xapian.WritableDatabase( 'nvim', xapian.DB_CREATE_OR_OPEN )
+db = xapian.WritableDatabase( database, xapian.DB_CREATE_OR_OPEN )
 tg = xapian.TermGenerator()
 tg.set_stemmer( xapian.Stem("en") )
 tg.set_stemming_strategy( tg.STEM_SOME )

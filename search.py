@@ -1,6 +1,9 @@
 import sys
 import xapian
 
+# TODO - make this centralised
+database = '.nvim'
+
 def search( db, query, offset=0, pagesize=10 ):
   qp = xapian.QueryParser()
   qp.set_stemmer( xapian.Stem("en") )
@@ -25,5 +28,5 @@ def search( db, query, offset=0, pagesize=10 ):
 
 
 
-db = xapian.Database( 'nvim' )
+db = xapian.Database( database )
 m = search( db, " ".join(sys.argv[1:]),0,40 )
