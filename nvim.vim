@@ -256,6 +256,48 @@ def load_note( note ): #{{{
   vim.command(cmd )
 # }}}
 
+def delete_note( filename ): #{{{
+  move_to_data()
+  vim.command( "enew" )
+  filename = nvimdb.get_filename( buf_results[0] )
+  if not filename:
+    return
+  os.remove(filename)
+  buf_results[0] = ""
+  nvimdb.rebuild_database()
+#}}}
+
+def delete_current_note(): #{{{
+  # TODO - can we ensure we are deleting the right one?
+  # TODO - ask for confirmation?
+  # clear the old window
+  filename = nvimdb.get_filename( buf_results[0] )
+  delete_note( filename )
+#}}}
+
+def rename_note(): #{{{
+  move_to_data()
+  oldname = nvimdb.get_filename( buf_results[0] )
+  vim.command( 'call inputsave()')
+  vim.command( 'let g:NVIM_newname=input("Enter new name:")' )
+  vim.command( 'call inputrestore()')
+  newname = vim.eval( 'g:NVIM_newname' )
+  # Allow aborts
+  if not newname:
+    return
+  # make sure it has the right extension
+  if not newname.endswith( nvimdb.extension ):
+    newname = newname + nvimdb.extension
+  # TODO check for success
+  # write out under the new name
+  vim.command( 'write '+newname )
+  # remove the old file
+  delete_note( oldname )
+  # reload it into the buffer under the new name
+  load_note( newname )
+
+#}}}
+
 def load_from_buffer(): #{{{
   move_to_results()
   (row,_) = vim.current.window.cursor
@@ -338,8 +380,12 @@ inoremap        <silent>  <Leader>i <ESC>:python handle_new_search()<CR>
 nnoremap        <silent>  <Leader>i :python handle_new_search()<CR>
 inoremap        <silent>  <Leader>l <ESC>:python handle_search()<CR>
 nnoremap        <silent>  <Leader>l :python handle_search()<CR>
-nnoremap        <silent>  <Leader><CR> :python load_from_selection()<CR>
 inoremap        <silent>  <Leader><CR> <ESC>:python load_from_selection()<CR>
+nnoremap        <silent>  <Leader><CR> :python load_from_selection()<CR>
+inoremap        <silent>  <Leader>d <ESC>:python delete_current_note()<CR>
+nnoremap        <silent>  <Leader>d :python delete_current_note()<CR>
+inoremap        <silent>  <Leader>r <ESC>:python rename_note()<CR>
+nnoremap        <silent>  <Leader>r :python rename_note()<CR>
 
 augroup nvim_group
   autocmd!

@@ -23,6 +23,10 @@ nvim binds several keys, all combos are started with the user's defined `<leader
 * `\<cr>`  This will follow a '[[...]]' link from within a note.
 * `\l` Move the cursor to the search area ready for changes.
 * `\i` As `\l`, but clears the current search term first (equivalent to `<esc>` on NV as remapping escape in vim is... unwise)
+* `\d` Delete a note. **warning** This will delete the note pointed to by the search bar. Under normal usage this should be correct. 
+ It does not currently ask confirmation.
+* `\r` Rename a note. This will *not* update any links in other notes.
+
 
 Note that if you try an load a note that does not exist, the system will create a new one.
 
