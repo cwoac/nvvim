@@ -13,9 +13,7 @@ The installation process is currently rather manual. Copy `nvim` to somewhere on
 
 I've made a quick screencast [here](http://showterm.io/3668688fe06b53482da16) outlining basic usage.
 
-
-* (Optionally) Use `index.py` to initialise the database with existing notes (see below).
-* run `nvim` from within that directory. You will be presented with two windows - on the right is the main pane where the note is displayed; on the left the list of search results.
+run `nvim` from within that directory. You will be presented with two windows - on the right is the main pane where the note is displayed; on the left the list of search results.
 The first line of the search box is the current search term.
 
 Use `[[` to trigger vim's autocomplete with the list of availiable titles.
@@ -31,21 +29,21 @@ Note that if you try an load a note that does not exist, the system will create 
 
 The full range of vim commands are availiable to you, but there are a couple of things to bear in mind:
 
-* autosave is turned on
-* you can create new windows via splits or whatever as you wish - when a note is loaded from the search results it will be loaded into the most recently used window.
-* if you close the results window (or all windows apart from the results window) you will need to close and reopen vim.
+* Autosave is turned on
+* You can create new windows via splits or whatever as you wish - when a note is loaded from the search results it will be loaded into the most recently used window.
+* If you close the results window (or all windows apart from the results window) you will need to close and reopen vim.
+* If you delete a note or alter the contents of notes outside of nvim, then you can refresh the database as under _importing_ below.
 
 ### Configuration
-configuration is handled at the top of the script / python files. The main one is the extension for notes. By default, nvim uses `.md` and will ignore files with any other extension.
+configuration is handled at the top of `nvim.vim`. The main one is the extension for notes. By default, nvim uses `.md` and will ignore files with any other extension.
 
 ### Importing
-If you have a bunch of notes already, then copy `index.py` to the note dir and run it (you can delete it afterwards) to populate the database with the details.
+If you have a bunch of notes already, then execute the following command to import them `:python nvimdb.rebuild_database()`. 
 
 ## TODO
 Quite a few things, although the code is quite usable as-is.
 
-* support note renames/deletes (currently you need to delete the `.nvim` dir and rerun `index.py` to handle a delete).
-* proper plugin mode (I'm not 100% sure about this, I suspect there are too many things it could conflict with).
+* support note renames/deletes
 * Allow hiding/reshowing the search results
 * Some proper documentation (screencasts!)
 * An installer

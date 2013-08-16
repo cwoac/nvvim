@@ -80,108 +80,141 @@ function! s:SetupResults()
 endfunction
 " }}}
 
-" function s:DefPython {{{
 " Declares all the python functions in the code
-function! s:DefPython()
+function! s:DefPython() " {{{
 python << PYEND
 import vim
 import os
 import xapian
+import shutil
 
-extension = vim.eval('g:NVIM_extension')
-database  = vim.eval('g:NVIM_database')
-language  = vim.eval('g:NVIM_language')
-db = xapian.WritableDatabase( database,xapian.DB_CREATE_OR_OPEN )
-qp = xapian.QueryParser()
-qp.set_stemmer( xapian.Stem( language ) )
-qp.set_stemming_strategy( qp.STEM_SOME )
-qp.add_prefix( "title","S" )
-tg = xapian.TermGenerator()
-tg.set_stemmer( xapian.Stem( language ) )
-tg.set_stemming_strategy( tg.STEM_SOME )
+# Handles the connection to the xapian database
+class Nvimdb: # {{{
+  # constructor
+  def __init__( self ): # {{{
+    self.extension = vim.eval('g:NVIM_extension')
+    self.database  = vim.eval('g:NVIM_database')
+    self.language  = vim.eval('g:NVIM_language')
+    self.reload_database()
+  #}}}
 
-e  = xapian.Enquire(db)
-e.set_sort_by_value( 2,False )
+  def reload_database( self ): # {{{
+    # create the xapian handlers
+    self.db = xapian.WritableDatabase( self.database,xapian.DB_CREATE_OR_OPEN )
 
-# TODO - merge index.py functionality into here somehow.
-def update_file( filename ):
-  fh = open( filename, 'r' )
-  data = fh.read()
-  fh.close()
+    self.qp = xapian.QueryParser()
+    self.qp.set_stemmer( xapian.Stem( self.language ) )
+    self.qp.set_stemming_strategy( self.qp.STEM_SOME )
+    self.qp.add_prefix( "title","S" )
 
-  norm_file = os.path.splitext(filename.replace('_',' '))[0]
+    self.tg = xapian.TermGenerator()
+    self.tg.set_stemmer( xapian.Stem( self.language ) )
+    self.tg.set_stemming_strategy( self.tg.STEM_SOME )
 
-  doc = xapian.Document()
-  tg.set_document(doc)
+    self.e  = xapian.Enquire(self.db)
+    # Value 2 is the lowercase form of the title
+    self.e.set_sort_by_value( 2,False )
+  #}}}
+    
+  def rebuild_database( self ): # {{{
+    self.db.close()
+    shutil.rmtree( self.database )
+    self.reload_database()
+    for f in os.listdir(os.getcwd()):
+      if f.endswith(self.extension):
+        self.update_file(f)
+    populate_buffer()
+  #}}}
 
-  tg.index_text( norm_file, 1, 'S' )
+  def update_file( self,filename ): # {{{
+    fh = open( filename, 'r' )
+    data = fh.read()
+    fh.close()
 
-  tg.index_text( norm_file )
-  tg.increase_termpos()
-  tg.index_text( data )
+    norm_file = os.path.splitext(filename.replace('_',' '))[0]
 
-  doc.add_value(1,norm_file)
-  doc.add_value(2,norm_file.lower())
+    doc = xapian.Document()
+    self.tg.set_document(doc)
 
-  doc.set_data( filename )
+    self.tg.index_text( norm_file, 1, 'S' )
 
-  id = u"Q" + norm_file
-  doc.add_boolean_term( id )
-  db.replace_document( id,doc )
+    self.tg.index_text( norm_file )
+    self.tg.increase_termpos()
+    self.tg.index_text( data )
+
+    doc.add_value(1,norm_file)
+    doc.add_value(2,norm_file.lower())
+
+    doc.set_data( filename )
+
+    id = u"Q" + norm_file
+    doc.add_boolean_term( id )
+    self.db.replace_document( id,doc )
+  #}}}
   
-def get_filename(title):
-  e.set_query( qp.parse_query("title:"+title) )
-  m=e.get_mset(0,db.get_doccount())
-  # if we can't find an existing file, create a new one by putting the default 
-  # extension on the end of the (munged) title
-  result = title.replace(' ','_')+extension
-  title_lower=title.lower()
-  if not m.empty():
-    for r in m:
-      if r.document.get_value(1).lower()==title_lower:
-        result=r.document.get_data()
-        break;
-  return result
+  def get_filename( self,title ): # {{{
+    self.e.set_query( self.qp.parse_query("title:"+title) )
+    m=self.e.get_mset(0,self.db.get_doccount())
+    # if we can't find an existing file, create a new one by putting the default 
+    # extension on the end of the (munged) title
+    result = title.replace(' ','_')+self.extension
+    title_lower=title.lower()
+    if not m.empty():
+      for r in m:
+        if r.document.get_value(1).lower()==title_lower:
+          result=r.document.get_data()
+          break;
+    return result
+  #}}}
 
-# Retrieve every document in the database.
-def get_all():
-  e.set_query(xapian.Query.MatchAll)
-  return e.get_mset(0,db.get_doccount())
+  # Retrieve every document in the database.
+  def get_all( self ): # {{{
+    self.e.set_query(xapian.Query.MatchAll)
+    return self.e.get_mset(0,self.db.get_doccount())
+  #}}}
 
-def get( base='' ):
-  if( base=='' ):
-    return get_all()
-  q=qp.parse_query(base,qp.FLAG_DEFAULT|qp.FLAG_PARTIAL|qp.FLAG_WILDCARD)
-  e.set_query(q)
-  return e.get_mset(0,db.get_doccount())
+  def get( self,base='' ): # {{{
+    if( base=='' ):
+      return self.get_all()
+    q=self.qp.parse_query(base,self.qp.FLAG_DEFAULT|self.qp.FLAG_PARTIAL|self.qp.FLAG_WILDCARD)
+    self.e.set_query(q)
+    return self.e.get_mset(0,self.db.get_doccount())
+  #}}}
+
+
+#END CLASS
+#}}}
 
 # Looks up the values to populate the [[...]] completion box
-def populate_complete(base=''):
-  m  = [ "'"+r.document.get_value(1)+"'" for r in get(base) ]
+def populate_complete( base='' ): #{{{
+  m  = [ "'"+r.document.get_value(1)+"'" for r in nvimdb.get(base) ]
   x  = ','.join(m)
   vim.command( "let g:nvim_ret=["+x+"]")
+#}}}
 
-def redraw_buffer( results ):
+def populate_initial_buffer(): #{{{
+  results=nvimdb.get_all()
+  buf_results[:]=None
+  redraw_buffer( results )
+#}}}
+
+def populate_buffer(): #{{{
+  search=buf_results[0]
+  results=nvimdb.get(search)
+  redraw_buffer( results )
+#}}}
+
+def redraw_buffer( results ): #{{{
   buf_results[1:] = None
   buf_results.append('----------')
   for r in results:
     buf_results.append(r.document.get_value(1))
-
-def populate_initial_buffer():
-  results=get_all()
-  buf_results[:]=None
-  redraw_buffer( results )
-
-
-def populate_buffer():
-  search=buf_results[0]
-  results=get(search)
-  redraw_buffer( results )
+#}}}
 
 # Called everytime the user presses a key when in seek mode on the title.
 # Returns True iff the user has hit a key which should terminate input.
 # TODO - implement Left/Right key support
-def handle_user( char ):
+def handle_user( char ): #{{{
   if char == '\r': # Carriage return
     load_from_buffer()
     return True
@@ -199,27 +232,31 @@ def handle_user( char ):
   buf_results[0]+=char
   populate_buffer()
   return False
+#}}}
 
-def set_entry_line( value ):
+def set_entry_line( value ): #{{{
   buf_results[0] = value
   populate_buffer()
   win_results.cursor=(1,1)
+#}}}
   
+def move_to_results(): #{{{
+  if vim.current.buffer != buf_results:
+    vim.command( str(win_results_nr) + " wincmd w" )
+# }}}    
 
-def load_note( note ):
+def move_to_data(): #{{{
+  if vim.current.buffer == buf_results:
+    vim.command( "wincmd p" )
+# }}}
+
+def load_note( note ): #{{{
   move_to_data()
   cmd = 'edit '+note.replace(' ','\ ')
   vim.command(cmd )
+# }}}
 
-def move_to_results():
-  if vim.current.buffer != buf_results:
-    vim.command( str(win_results_nr) + " wincmd w" )
-
-def move_to_data():
-  if vim.current.buffer == buf_results:
-    vim.command( "wincmd p" )
-
-def load_from_buffer():
+def load_from_buffer(): #{{{
   move_to_results()
   (row,_) = vim.current.window.cursor
   # convert from vim to python numbering
@@ -228,15 +265,16 @@ def load_from_buffer():
   if( row==1 ):
     return
 
-  filename = get_filename( buf_results[row] )
+  filename = nvimdb.get_filename( buf_results[row] )
   load_note( filename )
 
   # TODO - this should probably look things up properly and be in an event
   # handler, but it seems to work.
   set_entry_line( buf_results[row] )
+# }}}
 
 # Accept input into the entry line and present it accordingly. 
-def handle_entry_line():
+def handle_entry_line(): #{{{
   move_to_results()
   populate_initial_buffer()
   vim.command( 'redraw' )
@@ -245,28 +283,32 @@ def handle_entry_line():
     c = vim.eval("NVIM_getchar()")
     is_done = handle_user(c)
     vim.command("redraw")
-    
+#}}}    
 
 # Handle loading from a link in the text
-def load_from_selection():
+def load_from_selection(): #{{{
   # make sure the buffer is cleared
   vim.command( "let @n=''" )
   vim.command( 'normal "nyi]' )
   name = vim.eval( '@n' )
   if not name:
     return
-  filename = get_filename( name )
+  filename = nvimdb.get_filename( name )
   load_note( filename )
   # TODO - remove if/when we put it in an onload handler
   set_entry_line( name )
+# }}}
 
+# Python intiialisation code
+nvimdb = Nvimdb()
+populate_initial_buffer()
 PYEND
 endfunction
 " }}}
 
-" function s:setup_data {{{
+" function s:SetupData {{{
 " Called on all new buffers to set local options
-function! s:setup_data()
+function! s:SetupData()
   set completefunc=NVIM_complete
   set completeopt=menu,menuone,longest
   set ignorecase
@@ -277,10 +319,9 @@ endfunction
 "}}}
 
 " Initialisation code {{{
-call s:setup_data()
+call s:SetupData()
 call s:SetupResults()
 call s:DefPython()
-python populate_initial_buffer()
 
 inoremap        [[ [[]]<Left><Left><C-x><C-u>
 inoremap        <silent>  <Leader>i <ESC>:python handle_entry_line()<CR>
@@ -290,8 +331,8 @@ inoremap        <silent>  <Leader><CR> <ESC>:python load_from_selection()<CR>
 
 augroup nvim_group
   autocmd!
-  autocmd BufWritePost,FileWritePost,FileAppendPost * :python update_file( vim.eval('@%') )
-  autocmd BufNew * :call s:setup_data()
+  autocmd BufWritePost,FileWritePost,FileAppendPost * :python nvimdb.update_file( vim.eval('@%') )
+  autocmd BufNew * :call s:SetupData()
 augroup END
 
 " }}}
