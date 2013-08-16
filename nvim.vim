@@ -1,21 +1,27 @@
+" File: nvim.vim
+" Author: Oliver Matthews <oliver@codersoffortune.net>
+
+" Load guard {{{
+if exists('g:NVIM_loaded') || &cp
+  finish
+endif
+let g:NVIM_loaded    = 1
+" }}}
+
+" Configuration options {{{
+
+" The extension used for files.
+" Anything *not* ending in this will be ignored.
 let g:NVIM_extension = '.md'
+" The directory used for the note database
 let g:NVIM_database  = '.nvim'
+" The language used for xapian stemming
 let g:NVIM_language  = 'en'
+"}}}
 
-function! s:SetupBuffer()
-  30vnew  _nvim
-  python buf_results = vim.current.buffer
-  python win_results = vim.current.window
-  python win_results_nr = vim.eval('winnr()')
-
-  setlocal noswapfile
-  setlocal buftype=nofile
-  setlocal nobuflisted
-  setlocal cursorline
-  inoremap <buffer> <CR> <ESC>:python load_from_buffer()<CR>
-  nnoremap <buffer> <CR> :python load_from_buffer()<CR>
-endfunction
-
+" External Functions {{{
+" function NVIM_getchar {{{
+" calls getchar and converts it to a value python can use.
 " Needs to be external scope to allow calls from python
 function! NVIM_getchar()
   let c = getchar()
@@ -33,7 +39,49 @@ function! NVIM_getchar()
   endif
   return c
 endfunction
+" }}}
 
+" function NVIM_complete {{{
+" omnicomplete function for nvim
+function! NVIM_complete(findstart,base)
+    if a:findstart
+        " get last [
+        " strictly speaking unneeded unless the user does some funky remaps
+        let line = getline('.')
+        let start = col('.')-1
+        while start > 0 && line[start-1] != '['
+            let start -= 1
+        endwhile
+        return start
+    else 
+        let g:nvim_ret = [] 
+        python populate_complete(vim.eval('a:base'))
+        return g:nvim_ret
+    endif
+endfunction
+" }}}
+" }}}
+
+" Internal Functions {{{
+" function s:SetupResults {{{
+" creates the results window
+function! s:SetupResults()
+  30vnew  _nvim
+  python buf_results = vim.current.buffer
+  python win_results = vim.current.window
+  python win_results_nr = vim.eval('winnr()')
+
+  setlocal noswapfile
+  setlocal buftype=nofile
+  setlocal nobuflisted
+  setlocal cursorline
+  inoremap <buffer> <CR> <ESC>:python load_from_buffer()<CR>
+  nnoremap <buffer> <CR> :python load_from_buffer()<CR>
+endfunction
+" }}}
+
+" function s:DefPython {{{
+" Declares all the python functions in the code
 function! s:DefPython()
 python << PYEND
 import vim
@@ -214,35 +262,23 @@ def load_from_selection():
 
 PYEND
 endfunction
+" }}}
 
-function! s:NVIM_setup_data()
-  set completefunc=CompleteNVIM
+" function s:setup_data {{{
+" Called on all new buffers to set local options
+function! s:setup_data()
+  set completefunc=NVIM_complete
   set completeopt=menu,menuone,longest
   set ignorecase
   set infercase
   set autowriteall
 endfunction
+" }}}
+"}}}
 
-
-function! CompleteNVIM(findstart,base)
-    if a:findstart
-        " get last [
-        " strictly speaking unneeded unless the user does some funky remaps
-        let line = getline('.')
-        let start = col('.')-1
-        while start > 0 && line[start-1] != '['
-            let start -= 1
-        endwhile
-        return start
-    else 
-        let g:nvim_ret = [] 
-        python populate_complete(vim.eval('a:base'))
-        return g:nvim_ret
-    endif
-endfunction
-
-call s:NVIM_setup_data()
-call s:SetupBuffer()
+" Initialisation code {{{
+call s:setup_data()
+call s:SetupResults()
 call s:DefPython()
 python populate_initial_buffer()
 
@@ -255,5 +291,7 @@ inoremap        <silent>  <Leader><CR> <ESC>:python load_from_selection()<CR>
 augroup nvim_group
   autocmd!
   autocmd BufWritePost,FileWritePost,FileAppendPost * :python update_file( vim.eval('@%') )
-  autocmd BufNew * :call s:NVIM_setup_data()
+  autocmd BufNew * :call s:setup_data()
 augroup END
+
+" }}}
