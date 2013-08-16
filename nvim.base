@@ -1,0 +1,2 @@
+#!/bin/sh
+vim -S PREFIX/share/nvim/nvim.vim

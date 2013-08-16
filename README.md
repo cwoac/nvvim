@@ -7,7 +7,13 @@ A [Notational Velocity][nv] inspired mode for [vim][].
 This should work on any recent vim compiled with `+python`. You will also need the [xapian][] library and python bindings. Note that xapian does not currently work with python3.
 
 ## Installation
-The installation process is currently rather manual. Copy `nvim` to somewhere on your path and `nvim.vim` into `~/.vim/` (or anywhere else - just edit the nvim script accordingly)
+````
+make
+make install
+````
+This will install it to `/usr/local/bin/` and `/usr/local/share/nvim/`. If you want it to go somewhere else, `export PREFIX=/blah/` before calling `make;make install`
+
+
 
 ## Usage
 
