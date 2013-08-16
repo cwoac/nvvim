@@ -16,18 +16,17 @@ I've made a quick screencast [here](http://showterm.io/3668688fe06b53482da16) ou
 run `nvim` from within that directory. You will be presented with two windows - on the right is the main pane where the note is displayed; on the left the list of search results.
 The first line of the search box is the current search term.
 
-Use `[[` to trigger vim's autocomplete with the list of availiable titles.
+Use `[[` to trigger vim's auto-complete with the list of available titles.
 
-nvim binds two additional keys:
+nvim binds several keys, all combos are started with the user's defined `<leader>` key. If you haven't changed this, then it is `\` by default.
 
-* `<leader><cr>` (by default leader is '\') This will follow a '[[...]]' link from within a note.
-* `<leader>i` This will move the cursor to the search term box and start allowing input. 
-  As you type your term the search results will get updated with the matches from what you have typed so far.
-  Either press enter to load what you have typed or use the arrow keys followed by enter to select one of the results.
+* `\<cr>`  This will follow a '[[...]]' link from within a note.
+* `\l` Move the cursor to the search area ready for changes.
+* `\i` As `\l`, but clears the current search term first (equivalent to `<esc>` on NV as remapping escape in vim is... unwise)
 
 Note that if you try an load a note that does not exist, the system will create a new one.
 
-The full range of vim commands are availiable to you, but there are a couple of things to bear in mind:
+The full range of vim commands are available to you, but there are a couple of things to bear in mind:
 
 * Autosave is turned on
 * You can create new windows via splits or whatever as you wish - when a note is loaded from the search results it will be loaded into the most recently used window.

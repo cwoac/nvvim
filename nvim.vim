@@ -274,7 +274,17 @@ def load_from_buffer(): #{{{
 # }}}
 
 # Accept input into the entry line and present it accordingly. 
-def handle_entry_line(): #{{{
+def handle_search(): #{{{
+  move_to_results()
+  is_done = False
+  while not is_done:
+    c = vim.eval("NVIM_getchar()")
+    is_done = handle_user(c)
+    vim.command("redraw")
+#}}}    
+
+# Clear the search term and accept new input.
+def handle_new_search(): #{{{
   move_to_results()
   populate_initial_buffer()
   vim.command( 'redraw' )
@@ -324,8 +334,10 @@ call s:SetupResults()
 call s:DefPython()
 
 inoremap        [[ [[]]<Left><Left><C-x><C-u>
-inoremap        <silent>  <Leader>i <ESC>:python handle_entry_line()<CR>
-nnoremap        <silent>  <Leader>i :python handle_entry_line()<CR>
+inoremap        <silent>  <Leader>i <ESC>:python handle_new_search()<CR>
+nnoremap        <silent>  <Leader>i :python handle_new_search()<CR>
+inoremap        <silent>  <Leader>l <ESC>:python handle_search()<CR>
+nnoremap        <silent>  <Leader>l :python handle_search()<CR>
 nnoremap        <silent>  <Leader><CR> :python load_from_selection()<CR>
 inoremap        <silent>  <Leader><CR> <ESC>:python load_from_selection()<CR>
 
