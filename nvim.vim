@@ -55,7 +55,7 @@ tg.set_stemming_strategy( tg.STEM_SOME )
 e  = xapian.Enquire(db)
 e.set_sort_by_value( 2,False )
 
-# TODO - merge this into index.py somehow.
+# TODO - merge index.py functionality into here somehow.
 def update_file( filename ):
   fh = open( filename, 'r' )
   data = fh.read()
@@ -84,7 +84,8 @@ def update_file( filename ):
 def get_filename(title):
   e.set_query( qp.parse_query("title:"+title) )
   m=e.get_mset(0,db.get_doccount())
-  # if we can't find an existing file, just slap .whatever on the end and make a new one
+  # if we can't find an existing file, create a new one by putting the default 
+  # extension on the end of the (munged) title
   result = title.replace(' ','_')+extension
   title_lower=title.lower()
   if not m.empty():
@@ -94,7 +95,7 @@ def get_filename(title):
         break;
   return result
 
-
+# Retrieve every document in the database.
 def get_all():
   e.set_query(xapian.Query.MatchAll)
   return e.get_mset(0,db.get_doccount())
@@ -200,8 +201,12 @@ def handle_entry_line():
 
 # Handle loading from a link in the text
 def load_from_selection():
-  vim.command( 'normal yi]' )
-  name = vim.eval( '@"' )
+  # make sure the buffer is cleared
+  vim.command( "let @n=''" )
+  vim.command( 'normal "nyi]' )
+  name = vim.eval( '@n' )
+  if not name:
+    return
   filename = get_filename( name )
   load_note( filename )
   # TODO - remove if/when we put it in an onload handler
