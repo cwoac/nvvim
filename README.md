@@ -52,10 +52,8 @@ If you have a bunch of notes already, then execute the following command to impo
 ## TODO
 Quite a few things, although the code is quite usable as-is.
 
-* support note renames/deletes
 * Allow hiding/reshowing the search results
 * Some proper documentation (screencasts!)
-* An installer
 
  [nv]: http://www.notational.net
  [vim]: http://www.vim.org
