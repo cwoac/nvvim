@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8" />
+  <title>Cwoac{% if page.title %} - {% endif %}{{ page.title }}</title>
+  <link rel="stylesheet" href="{{ site.baseurl}}/css/style.css" />
+  <link rel="stylesheet" href="{{ site.baseurl}}/css/colors-light.css" />
+  <link rel="alternate" type="application/rss+xml" title="NVIM" href="{{ site.baseurl}}/feed.xml" />
+ </head>
+ <body>
+  <header id="header">
+   <hgroup>
+     <h1><a href="{{ site.baseurl}}/">{{ site.name }}</a></h1>
+     <h2>{{ site.description }}</h2>
+   </hgroup>
+  </header>
+
+  <section id="page">
+   {{ content }}
+  </section>
+
+  <footer id="footer">
+   <p>&copy; 2013 Oliver Matthews | All Rights Reserved. </p>
+  </footer>
+ </body>
+</html>
