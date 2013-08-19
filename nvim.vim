@@ -112,8 +112,10 @@ class Nvimdb: # {{{
     self.tg.set_stemming_strategy( self.tg.STEM_SOME )
 
     self.e  = xapian.Enquire(self.db)
+    self.sorted_e = xapian.Enquire(self.db)
     # Value 2 is the lowercase form of the title
-    self.e.set_sort_by_value( 2,False )
+    self.sorted_e.set_sort_by_value(2,False)
+
   #}}}
     
   def rebuild_database( self ): # {{{
@@ -169,8 +171,8 @@ class Nvimdb: # {{{
 
   # Retrieve every document in the database.
   def get_all( self ): # {{{
-    self.e.set_query(xapian.Query.MatchAll)
-    return self.e.get_mset(0,self.db.get_doccount())
+    self.sorted_e.set_query(xapian.Query.MatchAll)
+    return self.sorted_e.get_mset(0,self.db.get_doccount())
   #}}}
 
   def get( self,base='' ): # {{{
