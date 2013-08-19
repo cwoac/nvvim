@@ -10,12 +10,22 @@
  <body>
   <header id="header">
    <hgroup>
-     <h1><a href="{{ site.baseurl}}/">{{ site.name }}</a></h1>
+     <h1><a href="{{ site.baseurl }}/">{{ site.name }}</a></h1>
      <h2>{{ site.description }}</h2>
    </hgroup>
   </header>
 
+
   <section id="page">
+  <nav id="sidebar">
+    <ul>
+     <li><a href="{{ site.baseurl }}/">News</a></li>
+     <li><a href="{{ site.baseurl }}/about.html">About</a></li>
+     <li><a href="{{ site.baseurl }}/usage.html">Usage</a></li>
+     <li><a href="https://github.com/cwoac/nvim">GitHub</a></li>
+     <li><a href="https://github.com/cwoac/nvim/releases/tag/v1.0.0">Download v1.0.0</a></li>
+    </ul>
+  </nav>
    {{ content }}
   </section>
 
