@@ -8,11 +8,12 @@ title: index
 ## Installation
 
 On unix environments, unpack and run
-````
-make
-sudo make install
-````
-This will install it to `/usr/local/bin/` and `/usr/local/share/nvim/`. If you want it to go somewhere else, `export PREFIX=/blah/` before calling `make;make install`
+
+`make; sudo make install`
+
+This will install it to `/usr/local/bin/` and `/usr/local/share/nvim/`. 
+
+If you want it to go somewhere else, `export PREFIX=/blah/` first.
 
 In gvim or in windows, copy nvim.vim somewhere appropriate and source it on vim load. (More detailed instructions to follow)
 
