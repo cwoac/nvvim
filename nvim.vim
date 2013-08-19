@@ -203,6 +203,7 @@ def populate_initial_buffer(): #{{{
 def populate_buffer(): #{{{
   search=buf_results[0]
   results=nvimdb.get(search)
+  vim.command('let @/="'+search+'"')
   redraw_buffer( results )
 #}}}
 
@@ -376,6 +377,12 @@ endfunction
 call s:SetupData()
 call s:SetupResults()
 call s:DefPython()
+
+
+" search highlighting
+set hlsearch
+" clear previous search terms
+let @/=''
 
 inoremap        [[ [[]]<Left><Left><C-x><C-u>
 inoremap        <silent>  <Leader>i <ESC>:python handle_new_search()<CR>
