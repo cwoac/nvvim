@@ -159,7 +159,7 @@ class Nvimdb: # {{{
     m=self.e.get_mset(0,self.db.get_doccount())
     # if we can't find an existing file, create a new one by putting the default 
     # extension on the end of the (munged) title
-    result = title.replace(' ','_')+self.extension
+    result = title.replace('/','_').replace('\\','_')+self.extension
     title_lower=title.lower()
     if not m.empty():
       for r in m:
@@ -308,6 +308,9 @@ def load_from_buffer(): #{{{
   row -= 1
   # Don't load the divider
   if( row==1 ):
+    return
+  # Don't create an empty note
+  if not buf_results[row]:
     return
 
   filename = nvimdb.get_filename( buf_results[row] )
