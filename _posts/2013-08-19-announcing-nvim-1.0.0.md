@@ -4,8 +4,6 @@ subtitle: Notational velocity in vim
 layout: news
 ---
 
-## NVim
-
 [Nvim][] is an clone of some of the main features of [Notational Velocity][nv] as a vim script.
 
 NV/NValt remain one of the best arguments in favour of using OSX. A fast, efficient note-taking system that can be controlled entirely though the keyboard. 
@@ -13,6 +11,8 @@ Its combined search / title bar means you can just tell it what you want and you
 Unfortunately the codebase is too heavily dependant on OSX to make a port viable. 
 
 Nvim is implemented as a vim script that is compatible with both vim and gvim, so it can be used in both as a gui app and in a terminal and on any platform that runs the requirements[^1]
+
+![](https://raw.github.com/cwoac/nvim/gh-pages/images/mage.png)
 
 ## Download
 The latest code is availiable from [github][nvim], or you can download v1.0.0 in either [zip][] or [tar.gz][] formats.
