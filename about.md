@@ -26,6 +26,8 @@ It is designed for fast[^1] plain-text[^2] note-taking *and retrieval*
   Use all the keyboard tricks and plugins[^3] you love.
 * Language specific word-stemming.
   Thanks to [xapian][], search terms are automatically stemmed, so searches for `happiness` will match (to a lower amount) `happy`, `happiest`, etc.
+* Independant note sets:
+  The note metadata database is stored under the same directory as the notes themselves, so you can have multiple independent note sets (e.g. per project).
 
 [nv]: http://notational.net
 [xapian]: http://xapian.org
