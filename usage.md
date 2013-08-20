@@ -6,17 +6,24 @@ title: index
 #{{ page.title }}
 
 ## Installation
+The easiest way to install Nvim is to use [pathogen][]:
 
-On unix environments, unpack and run
+````
+cd ~/.vim/bundle
+git clone git://github.com/cwoac/nvim.git
+````
 
-`make; sudo make install`
+Or if you manage things yourself, copy `nvim.vim` into your ~/.vim/plugins directory.
 
-This will install it to `/usr/local/bin/` and `/usr/local/share/nvim/`. 
+### Script
 
-If you want it to go somewhere else, `export PREFIX=/blah/` first.
+NVim is not intended to be used in every vim session you open; to this end it will not be activated until you `:call NVIM_init()`
 
-In gvim or in windows, copy nvim.vim somewhere appropriate and source it on vim load. (More detailed instructions to follow)
+There is a supplied script `nvim` which will open vim and call this to drop you directly into nvim mode; simply copy it to somewhere on your path
 
+### Windows
+
+(g)vim under windows looks in `$HOME/vimfiles/` rather than `~/.vim` for its files. Apart from that (and the fact that the `nvim` script won't work, it should work identically under windows as linux - assuming you have got the requirements installed correctly.
 
 ## Basic usage
 I've made a quick screencast [here](http://showterm.io/3668688fe06b53482da16) outlining basic usage.
