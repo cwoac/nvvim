@@ -9,6 +9,8 @@ NVim is a clone of the mac app [Notational Velocity][nv] in vim.
 
 It is designed for fast[^1] plain-text[^2] note-taking *and retrieval*
 
+![](https://raw.github.com/cwoac/nvim/gh-pages/images/nvim.png)
+
 ## Features
 
 * Wide platform support:
