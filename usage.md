@@ -27,13 +27,15 @@ There is a supplied script `nvim` which will open vim and call this to drop you 
 ## Basic usage
 I've made a quick screencast [here](http://showterm.io/3668688fe06b53482da16) outlining basic usage.
 
-run `nvim` from the directory you want to store your notes in. You will be presented with two windows - on the right is the main pane where the note is displayed; on the left the list of search results.
+Either load vim and use the sequence `\ <F5>` or run `nvim` from the directory you want to store your notes in. You will be presented with two windows - on the right is the main pane where the note is displayed; on the left the list of search results.
 The first line of the search box is the current search term.
+![](https://raw.github.com/cwoac/nvim/gh-pages/images/nvim.png)
 
 Use `[[` to trigger vim's auto-complete with the list of available titles.
 
 nvim binds several keys, all combos are started with the user's defined `<leader>` key. If you haven't changed this, then it is `\` by default.
 
+* `\<F5>`  Invoke NVIM on the current directory. This is the only key bound until NVIM has been invoked once. Hitting it a second time will do nothing.
 * `\<cr>`  This will follow a '[[...]]' link from within a note.
 * `\l` Move the cursor to the search area ready for changes.
 * `\i` As `\l`, but clears the current search term first (equivalent to `<esc>` on NV as remapping escape in vim is... unwise)
