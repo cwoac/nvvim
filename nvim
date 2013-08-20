@@ -1,0 +1,2 @@
+#!/bin/sh
+vim -c 'exec NVIM_init()'

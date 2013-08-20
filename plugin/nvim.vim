@@ -6,7 +6,10 @@ if exists('g:NVIM_loaded') || &cp
   finish
 endif
 let g:NVIM_loaded    = 1
-" }}}
+
+"Lazy initialisation
+let g:NVIM_intialised = 0
+"}}}
 
 " Configuration options {{{
 
@@ -20,6 +23,47 @@ let g:NVIM_language  = 'en'
 "}}}
 
 " External Functions {{{
+
+" function NVIM_init {{{
+" Initialises the search bar
+function! NVIM_init()
+  if g:NVIM_intialised == 1
+    return
+  endif
+  echom "Initialising"
+  call s:SetupData()
+  call s:SetupResults()
+  call s:DefPython()
+
+
+  " search highlighting
+  set hlsearch
+  " clear previous search terms
+  let @/=''
+
+  inoremap        [[ [[]]<Left><Left><C-x><C-u>
+  inoremap        <silent>  <Leader>i <ESC>:python handle_new_search()<CR>
+  nnoremap        <silent>  <Leader>i :python handle_new_search()<CR>
+  inoremap        <silent>  <Leader>l <ESC>:python handle_search()<CR>
+  nnoremap        <silent>  <Leader>l :python handle_search()<CR>
+  inoremap        <silent>  <Leader><CR> <ESC>:python load_from_selection()<CR>
+  nnoremap        <silent>  <Leader><CR> :python load_from_selection()<CR>
+  inoremap        <silent>  <Leader>d <ESC>:python delete_current_note()<CR>
+  nnoremap        <silent>  <Leader>d :python delete_current_note()<CR>
+  inoremap        <silent>  <Leader>r <ESC>:python rename_note()<CR>
+  nnoremap        <silent>  <Leader>r :python rename_note()<CR>
+
+  augroup nvim_group
+    autocmd!
+    autocmd BufWritePost,FileWritePost,FileAppendPost * :python nvimdb.update_file( vim.eval('@%') )
+    autocmd BufNew * :call s:SetupData()
+  augroup END
+
+
+  let g:NVIM_intialised = 1
+endfunction
+" }}}
+
 " function NVIM_getchar {{{
 " calls getchar and converts it to a value python can use.
 " Needs to be external scope to allow calls from python
@@ -377,32 +421,5 @@ endfunction
 "}}}
 
 " Initialisation code {{{
-call s:SetupData()
-call s:SetupResults()
-call s:DefPython()
-
-
-" search highlighting
-set hlsearch
-" clear previous search terms
-let @/=''
-
-inoremap        [[ [[]]<Left><Left><C-x><C-u>
-inoremap        <silent>  <Leader>i <ESC>:python handle_new_search()<CR>
-nnoremap        <silent>  <Leader>i :python handle_new_search()<CR>
-inoremap        <silent>  <Leader>l <ESC>:python handle_search()<CR>
-nnoremap        <silent>  <Leader>l :python handle_search()<CR>
-inoremap        <silent>  <Leader><CR> <ESC>:python load_from_selection()<CR>
-nnoremap        <silent>  <Leader><CR> :python load_from_selection()<CR>
-inoremap        <silent>  <Leader>d <ESC>:python delete_current_note()<CR>
-nnoremap        <silent>  <Leader>d :python delete_current_note()<CR>
-inoremap        <silent>  <Leader>r <ESC>:python rename_note()<CR>
-nnoremap        <silent>  <Leader>r :python rename_note()<CR>
-
-augroup nvim_group
-  autocmd!
-  autocmd BufWritePost,FileWritePost,FileAppendPost * :python nvimdb.update_file( vim.eval('@%') )
-  autocmd BufNew * :call s:SetupData()
-augroup END
-
+nnoremap        <silent>  <Leader><F5> :call NVIM_init()<CR>
 " }}}

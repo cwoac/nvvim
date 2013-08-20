@@ -7,13 +7,20 @@ A [Notational Velocity][nv] inspired mode for [vim][].
 This should work on any recent vim compiled with `+python`. You will also need the [xapian][] library and python bindings. Note that xapian does not currently work with python3.
 
 ## Installation
-````
-make
-make install
-````
-This will install it to `/usr/local/bin/` and `/usr/local/share/nvim/`. If you want it to go somewhere else, `export PREFIX=/blah/` before calling `make;make install`
+Easiest way is to use [pathogen][]:
 
+````
+cd ~/.vim/bundle
+git clone git://github.com/cwoac/nvim.git
+````
 
+Or if you manage things yourself, copy `nvim.vim` into your ~/.vim/plugins directory.
+
+### Script
+
+NVim is not intended to be used in every vim session you open; to this end it will not be activated until you `:call NVIM_init()`
+
+There is a supplied script `nvim` which will open vim and call this to drop you directly into nvim mode; simply copy it to somewhere on your path
 
 ## Usage
 
@@ -26,6 +33,7 @@ Use `[[` to trigger vim's auto-complete with the list of available titles.
 
 nvim binds several keys, all combos are started with the user's defined `<leader>` key. If you haven't changed this, then it is `\` by default.
 
+* `\<F5>`  Invoke NVIM on the current directory. This is the only key bound until NVIM has been invoked once. Hitting it a second time will do nothing.
 * `\<cr>`  This will follow a '[[...]]' link from within a note.
 * `\l` Move the cursor to the search area ready for changes.
 * `\i` As `\l`, but clears the current search term first (equivalent to `<esc>` on NV as remapping escape in vim is... unwise)
@@ -58,3 +66,4 @@ Quite a few things, although the code is quite usable as-is.
  [nv]: http://www.notational.net
  [vim]: http://www.vim.org
  [xapian]: http://xapian.org
+ [pathogen]: https://github.com/tpope/vim-pathogen
