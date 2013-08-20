@@ -9,8 +9,7 @@ title: index
 The easiest way to install Nvim is to use [pathogen][]:
 
 ````
-cd ~/.vim/bundle
-git clone git://github.com/cwoac/nvim.git
+cd ~/.vim/bundle && git clone git://github.com/cwoac/nvim.git
 ````
 
 Or if you manage things yourself, copy `nvim.vim` into your ~/.vim/plugins directory.
