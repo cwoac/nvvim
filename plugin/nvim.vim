@@ -153,7 +153,10 @@ class Nvimdb: # {{{
 
     self.tg = xapian.TermGenerator()
     self.tg.set_stemmer( xapian.Stem( self.language ) )
-    self.tg.set_stemming_strategy( self.tg.STEM_SOME )
+    try:
+        self.tg.set_stemming_strategy( self.tg.STEM_SOME )
+    except AttributeError:
+        pass
 
     self.e  = xapian.Enquire(self.db)
     self.sorted_e = xapian.Enquire(self.db)
