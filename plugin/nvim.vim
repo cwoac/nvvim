@@ -31,6 +31,7 @@ function! NVIM_init()
     return
   endif
   echom "Initialising"
+  python "import vim"
   call s:SetupData()
   call s:SetupResults()
   call s:DefPython()
