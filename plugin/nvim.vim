@@ -31,7 +31,6 @@ function! NVIM_init()
     return
   endif
   echom "Initialising"
-  python "import vim"
   call s:SetupData()
   call s:SetupResults()
   call s:DefPython()
@@ -112,9 +111,6 @@ endfunction
 " creates the results window
 function! s:SetupResults()
   30vnew  _nvim
-  python buf_results = vim.current.buffer
-  python win_results = vim.current.window
-  python win_results_nr = vim.eval('winnr()')
 
   setlocal noswapfile
   setlocal buftype=nofile
@@ -406,6 +402,9 @@ def load_from_selection(): #{{{
 # }}}
 
 # Python intiialisation code
+buf_results = vim.current.buffer
+win_results = vim.current.window
+win_results_nr = vim.eval('winnr()')
 nvimdb = Nvimdb()
 populate_initial_buffer()
 PYEND
