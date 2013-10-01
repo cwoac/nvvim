@@ -163,6 +163,7 @@ class Nvimdb: # {{{
   #}}}
     
   def rebuild_database( self ): # {{{
+    debug( "rebuild_database" )
     self.db.close()
     shutil.rmtree( self.database )
     self.reload_database()
@@ -173,6 +174,7 @@ class Nvimdb: # {{{
   #}}}
 
   def update_file( self,filename ): # {{{
+    debug( "update_file on " + filename )
     fh = open( filename, 'r' )
     data = fh.read()
     fh.close()
@@ -303,6 +305,7 @@ def move_to_data(): #{{{
 # }}}
 
 def load_note( note ): #{{{
+  debug( "load_note on " + note )
   move_to_data()
   cmd = 'edit '+note.replace(' ','\ ')
   vim.command(cmd )
@@ -340,6 +343,7 @@ def delete_current_note(): #{{{
 #}}}
 
 def rename_note(): #{{{
+  debug( "rename_note" )
   move_to_data()
   oldname = nvimdb.get_filename( buf_results[0] )
   vim.command( 'call inputsave()')
@@ -352,7 +356,9 @@ def rename_note(): #{{{
   # make sure it has the right extension
   if not newname.endswith( nvimdb.extension ):
     newname = newname + nvimdb.extension
+  debug( "Going to rename " + oldname + " to " + newname );
   # TODO check for success
+  # TODO ensure it doesn't already exist?
   # write out under the new name
   vim.command( 'write '+newname )
   # remove the old file
@@ -422,7 +428,7 @@ def load_from_selection(): #{{{
 buf_results = vim.current.buffer
 win_results = vim.current.window
 win_results_nr = vim.eval('winnr()')
-nvim_debug = False
+nvim_debug = True
 nvimdb = Nvimdb()
 populate_initial_buffer()
 PYEND
