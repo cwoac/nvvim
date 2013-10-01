@@ -231,6 +231,11 @@ class Nvimdb: # {{{
 #END CLASS
 #}}}
 
+# enables / disables printing debug output
+def debug( msg ):
+  if nvim_debug:
+    vim.command( "echom '" + msg + "'" )
+
 # Looks up the values to populate the [[...]] completion box
 def populate_complete( base='' ): #{{{
   m  = [ "'"+r.document.get_value(1)+"'" for r in nvimdb.get(base) ]
@@ -304,21 +309,33 @@ def load_note( note ): #{{{
 # }}}
 
 def delete_note( filename ): #{{{
+  debug( "delete_note called for " + filename )
   move_to_data()
   vim.command( "enew" )
-  filename = nvimdb.get_filename( buf_results[0] )
-  if not filename:
-    return
   os.remove(filename)
   buf_results[0] = ""
   nvimdb.rebuild_database()
 #}}}
 
 def delete_current_note(): #{{{
-  # TODO - can we ensure we are deleting the right one?
+  filename=""
   # TODO - ask for confirmation?
-  # clear the old window
-  filename = nvimdb.get_filename( buf_results[0] )
+  if vim.current.buffer != buf_results:
+    filename = nvimdb.get_filename( buf_results[0] )
+  else:
+    # TODO - abstract this out of load_from_buffer
+    (row,_) = vim.current.window.cursor
+    # convert from vim to python numbering
+    row -= 1
+    # Don't load the divider
+    if( row==1 ):
+      return
+    # Don't create an empty note
+    if not buf_results[row]:
+      return
+    filename = nvimdb.get_filename( buf_results[row] )
+  if not filename:
+    return
   delete_note( filename )
 #}}}
 
@@ -405,6 +422,7 @@ def load_from_selection(): #{{{
 buf_results = vim.current.buffer
 win_results = vim.current.window
 win_results_nr = vim.eval('winnr()')
+nvim_debug = False
 nvimdb = Nvimdb()
 populate_initial_buffer()
 PYEND
