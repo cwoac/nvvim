@@ -128,6 +128,13 @@ import vim
 import os
 import xapian
 import shutil
+import tempfile
+
+# Debug function for handling wipe database errors
+def nvim_rmtree_error( func, path, exc_info ): # {{{
+  exctype,value = exc_info()[:2]
+  debug( "failed ("+func+") on "+path+": "+exc_type+" : " + value )
+#}}}
 
 # Handles the connection to the xapian database
 class Nvimdb: # {{{
@@ -161,11 +168,15 @@ class Nvimdb: # {{{
     self.sorted_e.set_sort_by_value(2,False)
 
   #}}}
+
     
   def rebuild_database( self ): # {{{
-    debug( "rebuild_database" )
+    debug( "rebuild_database in "+os.getcwd() )
     self.db.close()
-    shutil.rmtree( self.database )
+    tmpdir = tempfile.mkdtemp( prefix='.', dir=os.getcwd() )
+    debug( "tmpdir:" + tmpdir )
+    os.rename( self.database, os.path.join( tmpdir,self.database ) )
+    shutil.rmtree( tmpdir, onerror=nvim_rmtree_error )
     self.reload_database()
     for f in os.listdir(os.getcwd()):
       if f.endswith(self.extension):
