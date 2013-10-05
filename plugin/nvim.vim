@@ -110,6 +110,7 @@ endfunction
 " function s:SetupResults {{{
 " creates the results window
 function! s:SetupResults()
+  setlocal nosplitright
   30vnew  _nvim
 
   setlocal noswapfile
