@@ -1,2 +1,10 @@
 #!/bin/sh
-vim -c 'exec NVIM_init()'
+if [[ -z "$NVIM_HOME" ]]; then
+  export NVIM_HOME=$PWD
+fi
+
+if [[ -z "$NVIM_EDITOR" ]]; then
+  export NVIM_EDITOR='vim'
+fi
+
+cd $NVIM_HOME && $NVIM_EDITOR -c 'exec NVIM_init()'
