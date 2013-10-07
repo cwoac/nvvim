@@ -52,10 +52,23 @@ The full range of vim commands are available to you, but there are a couple of t
 * If you delete a note or alter the contents of notes outside of nvim, then you can refresh the database as under _importing_ below.
 
 ### Configuration
-configuration is handled at the top of `nvim.vim`. The main one is the extension for notes. By default, nvim uses `.md` and will ignore files with any other extension.
+Most of the configuration is handled at the top of `nvim.vim`. The main one is the extension for notes. By default, nvim uses `.md` and will ignore files with any other extension.
+
+If you use vim under a different name (e.g. `mvim` for macvim) then you can still use the nvim script by setting the `NVIM_EDITOR` environment variable.
+
+by default nvim allows multiple note directories. The downside to this is it requires being run from the directory containing all your notes. 
+If you would rather have a single note directory, then you can shorthand this by setting the `NVIM_HOME` environment variable and using the nvim script.
 
 ### Importing
 If you have a bunch of notes already, then execute the following command to import them `:python nvimdb.rebuild_database()`. 
+
+## Contributing
+Contributions are welcome; just submit a normal pull request. By doing so you assert that these changes are yours to submit and that you are providing these changes 'as-is' and that I may do whatever I wish with them.
+
+### Contributors
+Thanks to:
+@nixon
+@AzizLight
 
 ## TODO
 Quite a few things, although the code is quite usable as-is.
