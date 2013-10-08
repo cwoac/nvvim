@@ -72,8 +72,9 @@ Contributions are welcome; just submit a normal pull request. By doing so you as
 
 ### Contributors
 Thanks to:
-@nixon
-@AzizLight
+
+[@Nixon](https://github.com/Nixon)
+[@AzizLight](https://github.com/AzizLight)
 
 ## TODO
 Quite a few things, although the code is quite usable as-is.
