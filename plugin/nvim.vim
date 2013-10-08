@@ -20,6 +20,8 @@ let g:NVIM_extension = '.md'
 let g:NVIM_database  = '.nvim'
 " The language used for xapian stemming
 let g:NVIM_language  = 'en'
+" Which side you want the sidebar on. valid choices are 'right','left'.
+let g:NVIM_side = 'left'
 "}}}
 
 " External Functions {{{
@@ -31,6 +33,11 @@ function! NVIM_init()
     return
   endif
   echom "Initialising"
+  if g:NVIM_side ==? "right"
+    let g:NVIM_sidecmd = 'setlocal splitright'
+  else
+    let g:NVIM_sidecmd = 'setlocal nosplitright'
+  endif
   call s:SetupData()
   call s:SetupResults()
   call s:DefPython()
@@ -38,6 +45,7 @@ function! NVIM_init()
 
   " search highlighting
   set hlsearch
+
   " clear previous search terms
   let @/=''
 
@@ -110,7 +118,7 @@ endfunction
 " function s:SetupResults {{{
 " creates the results window
 function! s:SetupResults()
-  setlocal nosplitright
+  execute g:NVIM_sidecmd
   30vnew  _nvim
 
   setlocal noswapfile

@@ -52,7 +52,12 @@ The full range of vim commands are available to you, but there are a couple of t
 * If you delete a note or alter the contents of notes outside of nvim, then you can refresh the database as under _importing_ below.
 
 ### Configuration
-Most of the configuration is handled at the top of `nvim.vim`. The main one is the extension for notes. By default, nvim uses `.md` and will ignore files with any other extension.
+Most of the configuration is handled at the top of `nvim.vim`. These are:
+
+* `NVIM_extension` - the extension to use for files, and hence vim filetype detection. nvim will ignore any files in the directory that do not end with this.
+* `NVIM_language` - the language stemmer to use when parsing notes (requires xapian 1.1+). The list of availiable languages/stemmers depends on your version of xapian, but the normal set is listed [here](http://xapian.org/docs/apidoc/html/classXapian_1_1Stem.html#0f8f250587dfef35d47f13f0ec0028fb).
+* `NVIM_side` - which side of the screen the sidebar should be on. Defaults to the left.
+* `NVIM_database` - the name for the directory used to store note metadata. You probably shouldn't change this unless you are fairly sure you know what you are doing.
 
 If you use vim under a different name (e.g. `mvim` for macvim) then you can still use the nvim script by setting the `NVIM_EDITOR` environment variable.
 
