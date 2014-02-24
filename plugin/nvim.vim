@@ -256,6 +256,9 @@ class Nvimdb: # {{{
 # enables / disables printing debug output
 def debug( msg ):
   if nvim_debug:
+    # first need to sanitize the message
+    import re
+    msg = re.subn("'", "''", msg)[0]
     vim.command( "echom '" + msg + "'" )
 
 # Looks up the values to populate the [[...]] completion box
