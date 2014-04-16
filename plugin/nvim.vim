@@ -472,5 +472,6 @@ endfunction
 "}}}
 
 " Initialisation code {{{
+command!                          Nvim  call NVIM_init()
 nnoremap        <silent>  <Leader><F5> :call NVIM_init()<CR>
 " }}}
