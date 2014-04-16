@@ -105,8 +105,8 @@ function! NVIM_complete(findstart,base)
             let start -= 1
         endwhile
         return start
-    else 
-        let g:nvim_ret = [] 
+    else
+        let g:nvim_ret = []
         python populate_complete(vim.eval('a:base'))
         return g:nvim_ret
     endif
@@ -125,6 +125,7 @@ function! s:SetupResults()
   setlocal buftype=nofile
   setlocal nobuflisted
   setlocal cursorline
+  setlocal winfixwidth
   inoremap <buffer> <CR> <ESC>:python load_from_buffer()<CR>
   nnoremap <buffer> <CR> :python load_from_buffer()<CR>
 endfunction
@@ -178,7 +179,7 @@ class Nvimdb: # {{{
 
   #}}}
 
-    
+
   def rebuild_database( self ): # {{{
     debug( "rebuild_database in "+os.getcwd() )
     self.db.close()
@@ -219,11 +220,11 @@ class Nvimdb: # {{{
     doc.add_boolean_term( id )
     self.db.replace_document( id,doc )
   #}}}
-  
+
   def get_filename( self,title ): # {{{
     self.e.set_query( self.qp.parse_query("title:"+title) )
     m=self.e.get_mset(0,self.db.get_doccount())
-    # if we can't find an existing file, create a new one by putting the default 
+    # if we can't find an existing file, create a new one by putting the default
     # extension on the end of the (munged) title
     result = title.replace('/','_').replace('\\','_')+self.extension
     title_lower=title.lower()
@@ -316,11 +317,11 @@ def set_entry_line( value ): #{{{
   populate_buffer()
   win_results.cursor=(1,1)
 #}}}
-  
+
 def move_to_results(): #{{{
   if vim.current.buffer != buf_results:
     vim.command( str(win_results_nr) + " wincmd w" )
-# }}}    
+# }}}
 
 def move_to_data(): #{{{
   if vim.current.buffer == buf_results:
@@ -411,7 +412,7 @@ def load_from_buffer(): #{{{
   set_entry_line( buf_results[row] )
 # }}}
 
-# Accept input into the entry line and present it accordingly. 
+# Accept input into the entry line and present it accordingly.
 def handle_search(): #{{{
   move_to_results()
   is_done = False
@@ -419,7 +420,7 @@ def handle_search(): #{{{
     c = vim.eval("NVIM_getchar()")
     is_done = handle_user(c)
     vim.command("redraw")
-#}}}    
+#}}}
 
 # Clear the search term and accept new input.
 def handle_new_search(): #{{{
@@ -431,7 +432,7 @@ def handle_new_search(): #{{{
     c = vim.eval("NVIM_getchar()")
     is_done = handle_user(c)
     vim.command("redraw")
-#}}}    
+#}}}
 
 # Handle loading from a link in the text
 def load_from_selection(): #{{{
