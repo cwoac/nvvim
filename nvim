@@ -9,4 +9,4 @@ then
   export NVIM_EDITOR='vim'
 fi
 
-cd $NVIM_HOME && $NVIM_EDITOR -c 'exec NVIM_init()'
+cd "$NVIM_HOME" && $NVIM_EDITOR -c 'exec NVIM_init()'
