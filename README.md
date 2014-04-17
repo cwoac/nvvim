@@ -18,7 +18,7 @@ Or if you manage things yourself, copy `nvim.vim` into your ~/.vim/plugins direc
 
 ### Script
 
-NVim is not intended to be used in every vim session you open; to this end it will not be activated until you `:call NVIM_init()`
+NVim is not intended to be used in every vim session you open; to this end it will not be activated until you `:Nvim`
 
 There is a supplied script `nvim` which will open vim and call this to drop you directly into nvim mode; simply copy it to somewhere on your path
 
