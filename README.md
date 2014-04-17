@@ -26,7 +26,13 @@ There is a supplied script `nvim` which will open vim and call this to drop you 
 
 I've made a quick screencast [here](http://showterm.io/3668688fe06b53482da16) outlining basic usage.
 
-run `nvim` from within that directory. You will be presented with two windows - on the right is the main pane where the note is displayed; on the left the list of search results.
+nvim stores its notes and database within a single directory. Either:
+
+* export `NVIM_HOME=path/to/directory` and run `nvim`.
+* run `nvim path/to/directory` or
+* run `nvim` from within that directory. 
+
+You will then be presented with two windows - on the right is the main pane where the note is displayed; on the left the list of search results.
 The first line of the search box is the current search term.
 
 Use `[[` to trigger vim's auto-complete with the list of available titles.
