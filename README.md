@@ -75,6 +75,9 @@ Thanks to:
 
 [@Nixon](https://github.com/Nixon)
 [@AzizLight](https://github.com/AzizLight)
+[@Keithbsmiley](https://github.com/Keithbsmiley)
+[@colons](https://github.com/colons)
+[@shoaibkamil](https://github.com/shoaibkamil)
 
 ## TODO
 Quite a few things, although the code is quite usable as-is.
