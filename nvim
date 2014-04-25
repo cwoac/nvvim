@@ -1,5 +1,5 @@
 #!/bin/sh
-function usage
+usage ()
 {
 	echo "Usage: nvim [directory]"
 	echo ""
