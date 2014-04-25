@@ -1,4 +1,5 @@
 #!/bin/sh
+
 usage ()
 {
 	echo "Usage: nvim [directory]"
@@ -11,31 +12,31 @@ usage ()
 	exit 1
 }
 
-if [[ "$#" -gt 1 ]]
+if [ "$#" -gt 1 ]
 then
 	usage
 fi
 
-if [[ "$#" -gt 0 ]]
+if [ "$#" -gt 0 ]
 then
-	if [[ "$1" == "-h" || "$1" == "--help" ]]
+	if [ "$1" = "-h" -o "$1" = "--help" ]
 	then
 		usage
 	fi
 	export NVIM_HOME=$1
 fi
 
-if [[ -z "$NVIM_HOME" ]]
+if [ -z "$NVIM_HOME" ]
 then
   export NVIM_HOME=$PWD
 fi
 
-if [[ -z "$NVIM_EDITOR" ]]
+if [ -z "$NVIM_EDITOR" ]
 then
   export NVIM_EDITOR='vim'
 fi
 
-if [[ ! -d "$NVIM_HOME" ]]
+if [ ! -d "$NVIM_HOME" ]
 then
 	echo "Error: directory $NVIM_HOME does not appear to exist."
 	exit 1
