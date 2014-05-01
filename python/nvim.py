@@ -3,6 +3,7 @@ import os
 import xapian
 import shutil
 import tempfile
+import sys
 
 # Debug function for handling wipe database errors
 def nvim_rmtree_error( func, path, exc_info ): # {{{
@@ -81,7 +82,7 @@ class Nvimdb: # {{{
 
     doc.set_data( filename )
 
-    id = u"Q" + norm_file
+    id = u"Q" + unicode(norm_file,sys.getfilesystemencoding())
     doc.add_boolean_term( id )
     self.db.replace_document( id,doc )
   #}}}
