@@ -25,6 +25,7 @@ class Nvimdb: # {{{
     self.db = xapian.WritableDatabase( self.database,xapian.DB_CREATE_OR_OPEN )
 
     self.qp = xapian.QueryParser()
+    self.qp.set_database(self.db) # needed for incremental search
     self.qp.set_stemmer( xapian.Stem( self.language ) )
     self.qp.set_stemming_strategy( self.qp.STEM_SOME )
     self.qp.add_prefix( "title","S" )
