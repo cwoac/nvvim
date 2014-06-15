@@ -84,6 +84,7 @@ Thanks to:
 [@Keithbsmiley](https://github.com/Keithbsmiley)
 [@colons](https://github.com/colons)
 [@shoaibkamil](https://github.com/shoaibkamil)
+[@eklenske](https://github.com/eklenske)
 
 ## TODO
 Quite a few things, although the code is quite usable as-is.
