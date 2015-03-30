@@ -54,9 +54,12 @@ class Nvimdb: # {{{
     os.rename( self.database, os.path.join( tmpdir,self.database ) )
     shutil.rmtree( tmpdir, onerror=nvim_rmtree_error )
     self.reload_database()
-    for f in os.listdir(os.getcwd()):
+    base_dir = os.getcwd()
+    for f in os.listdir(base_dir):
       if f.endswith(self.extension):
-        self.update_file(f)
+        f_path = os.path.join(base_dir,f)
+        if not os.path.isdir(f_path):
+          self.update_file(f)
     populate_buffer()
   #}}}
 
