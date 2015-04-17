@@ -86,6 +86,10 @@ Thanks to:
 [@shoaibkamil](https://github.com/shoaibkamil)
 [@eklenske](https://github.com/eklenske)
 
+### Nixos
+
+I have added a default.nix for development under nixos. To use, switch to the src directory and run `nix-shell --pure`
+
 ## TODO
 Quite a few things, although the code is quite usable as-is.
 
