@@ -23,6 +23,8 @@ let g:NVIM_database  = '.nvim'
 let g:NVIM_language  = 'en'
 " Which side you want the sidebar on. valid choices are 'right','left'.
 let g:NVIM_side = 'left'
+" Map interactive mode leader commands
+let g:NVIM_interactive = 1
 "}}}
 
 " External Functions {{{
@@ -51,17 +53,18 @@ function! NVIM_init()
   let @/=''
 
   inoremap        [[ [[]]<Left><Left><C-x><C-u>
-  inoremap        <silent>  <Leader>i <ESC>:python handle_new_search()<CR>
   nnoremap        <silent>  <Leader>i :python handle_new_search()<CR>
-  inoremap        <silent>  <Leader>l <ESC>:python handle_search()<CR>
   nnoremap        <silent>  <Leader>l :python handle_search()<CR>
-  inoremap        <silent>  <Leader><CR> <ESC>:python load_from_selection()<CR>
   nnoremap        <silent>  <Leader><CR> :python load_from_selection()<CR>
-  inoremap        <silent>  <Leader>d <ESC>:python delete_current_note()<CR>
   nnoremap        <silent>  <Leader>d :python delete_current_note()<CR>
-  inoremap        <silent>  <Leader>r <ESC>:python rename_note()<CR>
   nnoremap        <silent>  <Leader>r :python rename_note()<CR>
-
+  if g:NVIM_interactive == 1
+    inoremap        <silent>  <Leader>i <ESC>:python handle_new_search()<CR>
+    inoremap        <silent>  <Leader>l <ESC>:python handle_search()<CR>
+    inoremap        <silent>  <Leader><CR> <ESC>:python load_from_selection()<CR>
+    inoremap        <silent>  <Leader>d <ESC>:python delete_current_note()<CR>
+    inoremap        <silent>  <Leader>r <ESC>:python rename_note()<CR>
+  endif
   augroup nvim_group
     autocmd!
     autocmd BufWritePost,FileWritePost,FileAppendPost * :python nvimdb.update_file( vim.eval('@%') )

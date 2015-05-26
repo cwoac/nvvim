@@ -64,6 +64,7 @@ Most of the configuration is handled at the top of `nvim.vim`. These are:
 * `NVIM_language` - the language stemmer to use when parsing notes (requires xapian 1.1+). The list of availiable languages/stemmers depends on your version of xapian, but the normal set is listed [here](http://xapian.org/docs/apidoc/html/classXapian_1_1Stem.html#0f8f250587dfef35d47f13f0ec0028fb).
 * `NVIM_side` - which side of the screen the sidebar should be on. Defaults to the left.
 * `NVIM_database` - the name for the directory used to store note metadata. You probably shouldn't change this unless you are fairly sure you know what you are doing.
+* `NVIM_interactive` - Whether to map the leader based commands in interactive mode.
 
 If you use vim under a different name (e.g. `mvim` for macvim) then you can still use the nvim script by setting the `NVIM_EDITOR` environment variable.
 
