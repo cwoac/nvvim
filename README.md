@@ -87,6 +87,9 @@ Thanks to:
 [@shoaibkamil](https://github.com/shoaibkamil)
 [@eklenske](https://github.com/eklenske)
 
+### Arch Linux
+nvim requires your vim installation to be compiled with `+python2`, under Arch this has recently changed to dynamic linking, so until xapian / vim sort it out (see [here](https://trac.xapian.org/ticket/623)), you will need to rebuild your vim accordingly
+
 ### Nixos
 
 I have added a default.nix for development under nixos. To use, switch to the src directory and run `nix-shell --pure`
