@@ -130,8 +130,8 @@ function! s:SetupResults()
   setlocal nobuflisted
   setlocal cursorline
   setlocal winfixwidth
-  inoremap <buffer> <CR> <ESC>:python load_from_buffer()<CR>
-  nnoremap <buffer> <CR> :python load_from_buffer()<CR>
+  inoremap <buffer> <CR> <ESC>:python3 load_from_buffer()<CR>
+  nnoremap <buffer> <CR> :python3 load_from_buffer()<CR>
 endfunction
 " }}}
 

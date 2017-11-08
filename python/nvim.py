@@ -29,12 +29,12 @@ class Nvimdb:  # {{{
     def reload_database(self):  # {{{
         ''' reload the database. '''
         # create the xapian handlers
-        self.database = xapian.WritableDatabase(
-            self.database, xapian.DB_CREATE_OR_OPEN)
+        self.database_handle = xapian.WritableDatabase(self.database,
+                                                       xapian.DB_CREATE_OR_OPEN)
 
         self.query_parser = xapian.QueryParser()
         # needed for incremental search
-        self.query_parser.set_database(self.database)
+        self.query_parser.set_database(self.database_handle)
         self.query_parser.set_stemmer(xapian.Stem(self.language))
         self.query_parser.set_stemming_strategy(self.query_parser.STEM_SOME)
         self.query_parser.add_prefix("title", "S")
@@ -47,8 +47,8 @@ class Nvimdb:  # {{{
         except AttributeError:
             pass
 
-        self.enquire = xapian.Enquire(self.database)
-        self.sorted_e = xapian.Enquire(self.database)
+        self.enquire = xapian.Enquire(self.database_handle)
+        self.sorted_e = xapian.Enquire(self.database_handle)
         # Value 2 is the lowercase form of the title
         self.sorted_e.set_sort_by_value(2, False)
 
@@ -58,7 +58,7 @@ class Nvimdb:  # {{{
         ''' delete (if applicable) and recreate the database.
         '''
         debug("rebuild_database in " + os.getcwd())
-        self.database.close()
+        self.database_handle.close()
         tmpdir = tempfile.mkdtemp(prefix='.', dir=os.getcwd())
         debug("tmpdir:" + tmpdir)
         os.rename(self.database, os.path.join(tmpdir, self.database))
@@ -95,24 +95,24 @@ class Nvimdb:  # {{{
 
         doc.set_data(filename)
 
-        file_id = "Q{}".format(norm_file)
+        file_id = "Q{}".format(str(norm_file))
         doc.add_boolean_term(file_id)
-        self.database.replace_document(file_id, doc)
+        self.database_handle.replace_document(file_id, doc)
     #}}}
 
     def get_filename(self, title):  # {{{
         ''' Determine the text file associated with a given title.
         '''
         self.enquire.set_query(self.query_parser.parse_query("title:" + title))
-        match_set = self.enquire.get_mset(0, self.database.get_doccount())
+        match_set = self.enquire.get_mset(0, self.database_handle.get_doccount())
         # if we can't find an existing file, create a new one by putting the default
         # extension on the end of the (munged) title
         result = title.replace('/', '_').replace('\\', '_') + self.extension
         title_lower = title.lower()
         if not match_set.empty():
-            for result in match_set:
-                if result.document.get_value(1).lower() == title_lower:
-                    result = result.document.get_data()
+            for match in match_set:
+                if match.document.get_value(1).lower() == title_lower:
+                    result = match.document.get_data()
                     break
         return result
     #}}}
@@ -121,7 +121,7 @@ class Nvimdb:  # {{{
         ''' Retrieve every document in the database.
         '''
         self.sorted_e.set_query(xapian.Query.MatchAll)
-        return self.sorted_e.get_mset(0, self.database.get_doccount())
+        return self.sorted_e.get_mset(0, self.database_handle.get_doccount())
     #}}}
 
     def get(self, base=''):  # {{{
@@ -134,7 +134,7 @@ class Nvimdb:  # {{{
                                               | self.query_parser.FLAG_PARTIAL
                                               | self.query_parser.FLAG_WILDCARD)
         self.enquire.set_query(query)
-        return self.enquire.get_mset(0, self.database.get_doccount())
+        return self.enquire.get_mset(0, self.database_handle.get_doccount())
     #}}}
 
 
@@ -241,7 +241,7 @@ def move_to_data():  # {{{
 def load_note(note):  # {{{
     ''' loads a note into the window.
     '''
-    debug("load_note on " + note)
+    debug("load_note on {}".format(note))
     move_to_data()
     cmd = 'edit ' + note.replace(' ', r'\ ')
     vim.command(cmd)
