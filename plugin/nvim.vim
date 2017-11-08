@@ -138,7 +138,7 @@ endfunction
 " Initalizes the python functions
 function! s:DefPython() " {{{
   let s:script = s:plug . '/python/nvim.py'
-  execute 'pyfile ' . s:script
+  execute 'py3file ' . s:script
 endfunction
 " }}}
 

@@ -85,7 +85,7 @@ class Nvimdb: # {{{
 
     doc.set_data( filename )
 
-    id = u"Q" + unicode(norm_file,sys.getfilesystemencoding())
+    id = "Q" + str(norm_file)
     doc.add_boolean_term( id )
     self.db.replace_document( id,doc )
   #}}}
