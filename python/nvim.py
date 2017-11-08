@@ -1,23 +1,24 @@
-import vim
+''' Python part of nvim module.
+'''
 import os
-import xapian
 import shutil
 import tempfile
-import sys
-
-# Debug function for handling wipe database errors
+import xapian
+import vim
 
 
 def nvim_rmtree_error(func, path, exc_info):  # {{{
+    ''' Debug function for handling wipe database errors. '''
     exctype, value = exc_info()[:2]
-    debug("failed (" + func + ") on " + path + ": " + exc_type + " : " + value)
+    debug("failed (" + func + ") on " + path + ": " + exctype + " : " + value)
 #}}}
-
-# Handles the connection to the xapian database
 
 
 class Nvimdb:  # {{{
+    ''' Class to handle connection to xapian database.
+    '''
     # constructor
+
     def __init__(self):  # {{{
         self.extension = vim.eval('g:NVIM_extension')
         self.database = vim.eval('g:NVIM_database')
@@ -26,127 +27,141 @@ class Nvimdb:  # {{{
     #}}}
 
     def reload_database(self):  # {{{
+        ''' reload the database. '''
         # create the xapian handlers
-        self.db = xapian.WritableDatabase(
+        self.database = xapian.WritableDatabase(
             self.database, xapian.DB_CREATE_OR_OPEN)
 
-        self.qp = xapian.QueryParser()
-        self.qp.set_database(self.db)  # needed for incremental search
-        self.qp.set_stemmer(xapian.Stem(self.language))
-        self.qp.set_stemming_strategy(self.qp.STEM_SOME)
-        self.qp.add_prefix("title", "S")
+        self.query_parser = xapian.QueryParser()
+        # needed for incremental search
+        self.query_parser.set_database(self.database)
+        self.query_parser.set_stemmer(xapian.Stem(self.language))
+        self.query_parser.set_stemming_strategy(self.query_parser.STEM_SOME)
+        self.query_parser.add_prefix("title", "S")
 
-        self.tg = xapian.TermGenerator()
-        self.tg.set_stemmer(xapian.Stem(self.language))
+        self.term_generator = xapian.TermGenerator()
+        self.term_generator.set_stemmer(xapian.Stem(self.language))
         try:
-            self.tg.set_stemming_strategy(self.tg.STEM_SOME)
+            self.term_generator.set_stemming_strategy(
+                self.term_generator.STEM_SOME)
         except AttributeError:
             pass
 
-        self.e = xapian.Enquire(self.db)
-        self.sorted_e = xapian.Enquire(self.db)
+        self.enquire = xapian.Enquire(self.database)
+        self.sorted_e = xapian.Enquire(self.database)
         # Value 2 is the lowercase form of the title
         self.sorted_e.set_sort_by_value(2, False)
 
     #}}}
 
     def rebuild_database(self):  # {{{
+        ''' delete (if applicable) and recreate the database.
+        '''
         debug("rebuild_database in " + os.getcwd())
-        self.db.close()
+        self.database.close()
         tmpdir = tempfile.mkdtemp(prefix='.', dir=os.getcwd())
         debug("tmpdir:" + tmpdir)
         os.rename(self.database, os.path.join(tmpdir, self.database))
         shutil.rmtree(tmpdir, onerror=nvim_rmtree_error)
         self.reload_database()
         base_dir = os.getcwd()
-        for f in os.listdir(base_dir):
-            if f.endswith(self.extension):
-                f_path = os.path.join(base_dir, f)
-                if not os.path.isdir(f_path):
-                    self.update_file(f)
+        for file_name in os.listdir(base_dir):
+            if file_name.endswith(self.extension):
+                file_path = os.path.join(base_dir, file_name)
+                if not os.path.isdir(file_path):
+                    self.update_file(file_name)
         populate_buffer()
     #}}}
 
     def update_file(self, filename):  # {{{
+        ''' update a single file's entry in the db.
+        '''
         debug("update_file on " + filename)
-        fh = open(filename, 'r')
-        data = fh.read()
-        fh.close()
+        data = open(filename, 'r').read()
 
         norm_file = os.path.splitext(filename.replace('_', ' '))[0]
 
         doc = xapian.Document()
-        self.tg.set_document(doc)
+        self.term_generator.set_document(doc)
 
-        self.tg.index_text(norm_file, 1, 'S')
+        self.term_generator.index_text(norm_file, 1, 'S')
 
-        self.tg.index_text(norm_file)
-        self.tg.increase_termpos()
-        self.tg.index_text(data)
+        self.term_generator.index_text(norm_file)
+        self.term_generator.increase_termpos()
+        self.term_generator.index_text(data)
 
         doc.add_value(1, norm_file)
         doc.add_value(2, norm_file.lower())
 
         doc.set_data(filename)
 
-        id = "Q" + str(norm_file)
-        doc.add_boolean_term(id)
-        self.db.replace_document(id, doc)
+        file_id = "Q{}".format(norm_file)
+        doc.add_boolean_term(file_id)
+        self.database.replace_document(file_id, doc)
     #}}}
 
     def get_filename(self, title):  # {{{
-        self.e.set_query(self.qp.parse_query("title:" + title))
-        m = self.e.get_mset(0, self.db.get_doccount())
+        ''' Determine the text file associated with a given title.
+        '''
+        self.enquire.set_query(self.query_parser.parse_query("title:" + title))
+        match_set = self.enquire.get_mset(0, self.database.get_doccount())
         # if we can't find an existing file, create a new one by putting the default
         # extension on the end of the (munged) title
         result = title.replace('/', '_').replace('\\', '_') + self.extension
         title_lower = title.lower()
-        if not m.empty():
-            for r in m:
-                if r.document.get_value(1).lower() == title_lower:
-                    result = r.document.get_data()
+        if not match_set.empty():
+            for result in match_set:
+                if result.document.get_value(1).lower() == title_lower:
+                    result = result.document.get_data()
                     break
         return result
     #}}}
 
-    # Retrieve every document in the database.
     def get_all(self):  # {{{
+        ''' Retrieve every document in the database.
+        '''
         self.sorted_e.set_query(xapian.Query.MatchAll)
-        return self.sorted_e.get_mset(0, self.db.get_doccount())
+        return self.sorted_e.get_mset(0, self.database.get_doccount())
     #}}}
 
     def get(self, base=''):  # {{{
-        if(base == ''):
+        ''' look up a term in the database.
+        '''
+        if base == '':
             return self.get_all()
-        q = self.qp.parse_query(
-            base, self.qp.FLAG_DEFAULT | self.qp.FLAG_PARTIAL | self.qp.FLAG_WILDCARD)
-        self.e.set_query(q)
-        return self.e.get_mset(0, self.db.get_doccount())
+        query = self.query_parser.parse_query(base,
+                                              self.query_parser.FLAG_DEFAULT
+                                              | self.query_parser.FLAG_PARTIAL
+                                              | self.query_parser.FLAG_WILDCARD)
+        self.enquire.set_query(query)
+        return self.enquire.get_mset(0, self.database.get_doccount())
     #}}}
 
 
 # END CLASS
 #}}}
 
-# enables / disables printing debug output
 def debug(msg):
+    ''' enables / disables printing debug output. '''
     if nvim_debug:
         # first need to sanitize the message
         import re
         msg = re.subn("'", "''", msg)[0]
         vim.command("echom '" + msg + "'")
 
-# Looks up the values to populate the [[...]] completion box
-
 
 def populate_complete(base=''):  # {{{
-    m = ["'" + r.document.get_value(1) + "'" for r in nvimdb.get(base)]
-    x = ','.join(m)
-    vim.command("let g:nvim_ret=[" + x + "]")
+    ''' Looks up the values to populate the [[...]] completion box.
+    '''
+    hits = ["'" + r.document.get_value(1) + "'" for r in nvimdb.get(base)]
+    result = ','.join(hits)
+    vim.command("let g:nvim_ret=[" + result + "]")
 #}}}
 
 
 def populate_initial_buffer():  # {{{
+    ''' draws the initial screen showing all documents.
+    '''
     results = nvimdb.get_all()
     buf_results[:] = None
     redraw_buffer(results)
@@ -154,6 +169,8 @@ def populate_initial_buffer():  # {{{
 
 
 def populate_buffer():  # {{{
+    ''' reruns the search then draws the buffer.
+    '''
     search = buf_results[0]
     results = nvimdb.get(search)
     vim.command('let @/="' + search + '"')
@@ -162,18 +179,20 @@ def populate_buffer():  # {{{
 
 
 def redraw_buffer(results):  # {{{
+    ''' draws the buffer.
+    '''
     buf_results[1:] = None
     buf_results.append('----------')
-    for r in results:
-        buf_results.append(r.document.get_value(1))
+    for result in results:
+        buf_results.append(result.document.get_value(1))
 #}}}
 
-# Called everytime the user presses a key when in seek mode on the title.
-# Returns True iff the user has hit a key which should terminate input.
-# TODO - implement Left/Right key support
-
-
 def handle_user(char):  # {{{
+    ''' Called everytime the user presses a key when in seek mode on the title.
+        Returns True iff the user has hit a key which should terminate input.
+        TODO - implement Left/Right key support
+    '''
+
     if char == '\r':  # Carriage return
         load_from_buffer()
         return True
@@ -195,6 +214,8 @@ def handle_user(char):  # {{{
 
 
 def set_entry_line(value):  # {{{
+    ''' set the entry line and regenerate the results buffer.
+    '''
     buf_results[0] = value
     populate_buffer()
     win_results.cursor = (1, 1)
@@ -202,26 +223,34 @@ def set_entry_line(value):  # {{{
 
 
 def move_to_results():  # {{{
+    ''' Make sure we are on the results buffer.
+    '''
     if vim.current.buffer != buf_results:
         vim.command(str(win_results_nr) + " wincmd w")
 # }}}
 
 
 def move_to_data():  # {{{
+    ''' Make sure we are on the data buffer.
+    '''
     if vim.current.buffer == buf_results:
         vim.command("wincmd p")
 # }}}
 
 
 def load_note(note):  # {{{
+    ''' loads a note into the window.
+    '''
     debug("load_note on " + note)
     move_to_data()
-    cmd = 'edit ' + note.replace(' ', '\ ')
+    cmd = 'edit ' + note.replace(' ', r'\ ')
     vim.command(cmd)
 # }}}
 
 
 def delete_note(filename):  # {{{
+    ''' deletes a given note.
+    '''
     debug("delete_note called for " + filename)
     move_to_data()
     vim.command("enew")
@@ -232,6 +261,7 @@ def delete_note(filename):  # {{{
 
 
 def delete_current_note():  # {{{
+    ''' deletes the currently open note.'''
     filename = ""
     # TODO - ask for confirmation?
     if vim.current.buffer != buf_results:
@@ -242,7 +272,7 @@ def delete_current_note():  # {{{
         # convert from vim to python numbering
         row -= 1
         # Don't load the divider
-        if(row == 1):
+        if row == 1:
             return
         # Don't create an empty note
         if not buf_results[row]:
@@ -255,6 +285,7 @@ def delete_current_note():  # {{{
 
 
 def rename_note():  # {{{
+    '''renames a note.'''
     debug("rename_note")
     move_to_data()
     oldname = nvimdb.get_filename(buf_results[0])
@@ -282,12 +313,14 @@ def rename_note():  # {{{
 
 
 def load_from_buffer():  # {{{
+    ''' load the currently selected note in the search results.
+    '''
     move_to_results()
     (row, _) = vim.current.window.cursor
     # convert from vim to python numbering
     row -= 1
     # Don't load the divider
-    if(row == 1):
+    if row == 1:
         return
     # Don't create an empty note
     if not buf_results[row]:
@@ -301,36 +334,36 @@ def load_from_buffer():  # {{{
     set_entry_line(buf_results[row])
 # }}}
 
-# Accept input into the entry line and present it accordingly.
-
 
 def handle_search():  # {{{
+    ''' Accept input into the entry line and present it accordingly.
+    '''
     move_to_results()
     is_done = False
     while not is_done:
-        c = vim.eval("NVIM_getchar()")
-        is_done = handle_user(c)
+        char = vim.eval("NVIM_getchar()")
+        is_done = handle_user(char)
         vim.command("redraw")
 #}}}
 
-# Clear the search term and accept new input.
-
 
 def handle_new_search():  # {{{
+    ''' Clear the search term and accept new input.
+    '''
     move_to_results()
     populate_initial_buffer()
     vim.command('redraw')
     is_done = False
     while not is_done:
-        c = vim.eval("NVIM_getchar()")
-        is_done = handle_user(c)
+        char = vim.eval("NVIM_getchar()")
+        is_done = handle_user(char)
         vim.command("redraw")
 #}}}
 
-# Handle loading from a link in the text
-
 
 def load_from_selection():  # {{{
+    ''' Handle loading from a link in the text.
+    '''
     # make sure the buffer is cleared
     vim.command("let @n=''")
     vim.command('normal "nyi]')
@@ -344,7 +377,7 @@ def load_from_selection():  # {{{
 # }}}
 
 
-# Python intiialisation code
+# Python initialisation code
 buf_results = vim.current.buffer
 win_results = vim.current.window
 win_results_nr = vim.eval('winnr()')
