@@ -4,7 +4,7 @@ A [Notational Velocity][nv] inspired mode for [vim][].
 
 
 ## Requirements
-This should work on any recent vim compiled with `+python`. You will also need the [xapian][] library and python bindings. Note that xapian does not currently work with python3.
+This should work on any recent vim compiled with `+python3`. You will also need the [xapian][] library and python bindings.
 
 ## Installation
 Easiest way is to use [pathogen][]:
@@ -14,7 +14,7 @@ cd ~/.vim/bundle
 git clone git://github.com/cwoac/nvim.git
 ````
 
-Or if you manage things yourself, copy `nvim.vim` into your ~/.vim/plugins directory.
+Or if you manage things yourself, copy `nvim.vim` into your `~/.vim/plugins` directory and `nvim.py` into `~/.vim/python`
 
 ### Script
 
@@ -87,8 +87,9 @@ Thanks to:
 [@shoaibkamil](https://github.com/shoaibkamil)
 [@eklenske](https://github.com/eklenske)
 
-### Arch Linux
-nvim requires your vim installation to be compiled with `+python2`, under Arch this has recently changed to dynamic linking, so until xapian / vim sort it out (see [here](https://trac.xapian.org/ticket/623)), you will need to rebuild your vim accordingly
+### dynamic python (i.e. Arch Linux)
+If your installation of vim is compiled using dynamic linking (e.g. Arch linux), then nvim requires libpython3.so to be preloaded or it won't work. the `nvim` script should handle this for you. If you are invoking nvim by hand, set `LD_PRELOAD=/path/to/libpython3.so`. The script assumes this file is in `/usr/lib/libpython3.so`, which is the normal location. If for some reason it is elsewhere, then you will need to set the `NVIM_PYTHON3_SO` environment variable accordingly.
+This may have some additional unintended consequences - for one thing, plugins which depend on python2 will almost certainly crash vim while using nvim via dynamic python3.
 
 ### Nixos
 

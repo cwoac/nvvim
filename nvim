@@ -2,28 +2,29 @@
 
 usage ()
 {
-	echo "Usage: nvim [directory]"
-	echo ""
-	echo "Where directory is where you want to store your notes."
-	echo ""
-	echo "Environment variables:"
-	echo "NVIM_HOME: Which directory to use as a default (if not overridden via command line). Defaults to current directory."
-	echo "NVIM_EDITOR: Command to execute to invoke vim. Defaults to 'vim'"
-	exit 1
+  echo "Usage: nvim [directory]"
+  echo ""
+  echo "Where directory is where you want to store your notes."
+  echo ""
+  echo "Environment variables:"
+  echo "NVIM_HOME: Which directory to use as a default (if not overridden via command line). Defaults to current directory."
+  echo "NVIM_EDITOR: Command to execute to invoke vim. Defaults to 'vim'"
+  echo "NVIM_PYTHON3_SO: location of libpython3.so file if vim is compiled with 'python3/dyn' and the file is not /usr/lib/libpython3.so"
+  exit 1
 }
 
 if [ "$#" -gt 1 ]
 then
-	usage
+  usage
 fi
 
 if [ "$#" -gt 0 ]
 then
-	if [ "$1" = "-h" -o "$1" = "--help" ]
-	then
-		usage
-	fi
-	export NVIM_HOME=$1
+  if [ "$1" = "-h" -o "$1" = "--help" ]
+  then
+    usage
+  fi
+  export NVIM_HOME=$1
 fi
 
 if [ -z "$NVIM_HOME" ]
@@ -36,10 +37,38 @@ then
   export NVIM_EDITOR='vim'
 fi
 
+if [ -z "$NVIM_PYTHON3_SO" ]
+then
+  export NVIM_PYTHON3_SO='/usr/lib/libpython3.so'
+fi
+
 if [ ! -d "$NVIM_HOME" ]
 then
-	echo "Error: directory $NVIM_HOME does not appear to exist."
-	exit 1
+  echo "Error: directory $NVIM_HOME does not appear to exist."
+  exit 1
+fi
+
+FLAGS=$($NVIM_EDITOR --version)
+echo $FLAGS | grep python3 >/dev/null
+PYTHON3=$?
+
+if [ $PYTHON3 == 1 ]
+then
+  echo "Error, $NVIM_EDITOR is not compiled with python3 support"
+  exit 1
+fi
+
+echo $FLAGS | grep 'python3/dyn' >/dev/null
+PYTHON3DYN=$?
+
+if [ $PYTHON3DYN == 0 ]
+then
+  if [ ! -f "$NVIM_PYTHON3_SO" ]
+  then
+    echo "Error: $NVIM_EDITOR is compiled with dynamic python3 support, and I can't find libpython3.so"
+    usage
+  fi
+  export LD_PRELOAD=$NVIM_PYTHON3_SO
 fi
 
 cd "$NVIM_HOME" && $NVIM_EDITOR -c 'exec NVIM_init()'
