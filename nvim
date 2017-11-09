@@ -49,10 +49,10 @@ then
 fi
 
 FLAGS=$($NVIM_EDITOR --version)
-echo $FLAGS | grep python3 >/dev/null
+echo $FLAGS | grep '+python3' >/dev/null
 PYTHON3=$?
 
-if [ $PYTHON3 == 1 ]
+if [ $PYTHON3 -eq 1 ]
 then
   echo "Error, $NVIM_EDITOR is not compiled with python3 support"
   exit 1
@@ -61,7 +61,7 @@ fi
 echo $FLAGS | grep 'python3/dyn' >/dev/null
 PYTHON3DYN=$?
 
-if [ $PYTHON3DYN == 0 ]
+if [ $PYTHON3DYN -eq 0 ]
 then
   if [ ! -f "$NVIM_PYTHON3_SO" ]
   then
