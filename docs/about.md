@@ -5,7 +5,7 @@ title: index
 
 #{{ page.title }}
 
-NVim is a clone of the mac app [Notational Velocity][nv] in vim.
+NVVim is a clone of the mac app [Notational Velocity][nv] in vim.
 
 It is designed for fast[^1] plain-text[^2] note-taking *and retrieval*
 
@@ -35,5 +35,5 @@ It is designed for fast[^1] plain-text[^2] note-taking *and retrieval*
 [xapian]: http://xapian.org
 
 [^1]: On my test atom netbook, indexing 1.7mb of notes spread across ~300 files takes about 10s. Searching is instantaneous.
-[^2]: By default NVim uses '.md' as an extension so your notes will be highlighted as Markdown documents, but you can configure this.
+[^2]: By default NVVim uses '.md' as an extension so your notes will be highlighted as Markdown documents, but you can configure this.
 [^3]: In theory, as long as you leave the search window visible and another window open then nvim should run alongside any other plugins.

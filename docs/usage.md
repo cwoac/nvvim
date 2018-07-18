@@ -6,19 +6,19 @@ title: index
 #{{ page.title }}
 
 ## Installation
-The easiest way to install Nvim is to use [pathogen][]:
+The easiest way to install NVVim is to use [pathogen][]:
 
 ````
 cd ~/.vim/bundle && git clone git://github.com/cwoac/nvim.git
 ````
 
-Or if you manage things yourself, copy `nvim.vim` into your ~/.vim/plugins directory.
+Or if you manage things yourself, copy `nvvim.vim` into your ~/.vim/plugins directory.
 
 ### Script
 
-NVim is not intended to be used in every vim session you open; to this end it will not be activated until you `:call NVIM_init()`
+NVVim is not intended to be used in every vim session you open; to this end it will not be activated until you `:call NVIM_init()`
 
-There is a supplied script `nvim` which will open vim and call this to drop you directly into nvim mode; simply copy it to somewhere on your path
+There is a supplied script `nvvim` which will open vim and call this to drop you directly into nvim mode; simply copy it to somewhere on your path
 
 ### Windows
 
@@ -27,15 +27,17 @@ There is a supplied script `nvim` which will open vim and call this to drop you 
 ## Basic usage
 I've made a quick screencast [here](http://showterm.io/3668688fe06b53482da16) outlining basic usage.
 
-Either load vim and use the sequence `\ <F5>` or run `nvim` from the directory you want to store your notes in. You will be presented with two windows - on the right is the main pane where the note is displayed; on the left the list of search results.
+Note that the screencast dates back to when the program was called nvim.
+
+Either load vim and use the sequence `\ <F5>` or run `nvvim` from the directory you want to store your notes in. You will be presented with two windows - on the right is the main pane where the note is displayed; on the left the list of search results.
 The first line of the search box is the current search term.
 ![](https://raw.github.com/cwoac/nvim/gh-pages/images/nvim.png)
 
 Use `[[` to trigger vim's auto-complete with the list of available titles.
 
-nvim binds several keys, all combos are started with the user's defined `<leader>` key. If you haven't changed this, then it is `\` by default.
+nvvim binds several keys, all combos are started with the user's defined `<leader>` key. If you haven't changed this, then it is `\` by default.
 
-* `\<F5>`  Invoke NVIM on the current directory. This is the only key bound until NVIM has been invoked once. Hitting it a second time will do nothing.
+* `\<F5>`  Invoke NVVim on the current directory. This is the only key bound until NVVim has been invoked once. Hitting it a second time will do nothing.
 * `\<cr>`  This will follow a '[[...]]' link from within a note.
 * `\l` Move the cursor to the search area ready for changes.
 * `\i` As `\l`, but clears the current search term first (equivalent to `<esc>` on NV as remapping escape in vim is... unwise)
@@ -57,5 +59,5 @@ The full range of vim commands are available to you, but there are a couple of t
 If you have a bunch of notes already, then execute the following command to import them `:python nvimdb.rebuild_database()`. 
 
 ## Configuration
-configuration is handled at the top of `nvim.vim`. The main one is the extension for notes. By default, nvim uses `.md` and will ignore files with any other extension.
+configuration is handled at the top of `nvvim.vim`. The main one is the extension for notes. By default, nvim uses `.md` and will ignore files with any other extension.
 
