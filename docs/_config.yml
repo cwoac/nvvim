@@ -1,0 +1,9 @@
+baseurl: /nvvim
+name: NVVim
+url: http://cwoac.github.com
+description: A Notational Velocity inspired mode for (g)vim
+permalink: /:year/:month/:day/:title/
+paginate: 5
+highlighter: rouge
+
+

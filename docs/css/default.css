@@ -1,0 +1,41 @@
+html { font-family: sans-serif; }
+body { margin: 0; }
+
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+header,footer {
+  display: block;
+  background-color: lightgrey;
+}
+
+header a {
+  display: table-cell;
+  padding: 10px;
+  text-decoration: none;
+  color: black;
+}
+
+header a#indexLink {
+  font-family: monospace;
+  font-weight: bold;
+  font-size: larger;
+}
+
+header a:hover {
+  color: white;
+  background-color: grey;
+}
+
+header a.selected {
+  background-color: grey;
+  color: white;
+}
+
+
+article header a
+{
+  display:inline;
+  padding:0px;
+}
+
